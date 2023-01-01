@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class TransportInfo {
+public class TransitInfo {
     private TRANSIT type;
     private String name;
     private String from;

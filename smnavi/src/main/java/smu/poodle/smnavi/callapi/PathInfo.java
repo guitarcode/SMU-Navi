@@ -8,18 +8,19 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class PathInfo {
-    private List<TransportInfo> transportInfoList;
+    private int transitInfoCnt;
+    private List<TransitInfo> transitInfoList;
+    private int gpsPointCnt;
     private List<GpsPoint> gpsPointList;
     private int time;
 
-    @Override
-    public String toString() {
-        return "PathInfo{" +
-                "busInfoList=" + transportInfoList +
-                ", gpsPointList=" + gpsPointList +
-                ", time=" + time +
-                '}';
+    public PathInfo(List<TransitInfo> transitInfoList, List<GpsPoint> gpsPointList, int time) {
+        this.transitInfoList = transitInfoList;
+        this.gpsPointList = gpsPointList;
+        this.time = time;
+        this.transitInfoCnt = transitInfoList.size();
+        this.gpsPointCnt = gpsPointList.size();
     }
+
 }
