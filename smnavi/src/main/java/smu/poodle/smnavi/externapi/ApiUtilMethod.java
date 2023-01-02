@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.callapi;
+package smu.poodle.smnavi.externapi;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
