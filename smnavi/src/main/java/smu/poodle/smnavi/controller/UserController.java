@@ -1,7 +1,6 @@
 package smu.poodle.smnavi.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import smu.poodle.smnavi.domain.User;
 import smu.poodle.smnavi.service.UserService;

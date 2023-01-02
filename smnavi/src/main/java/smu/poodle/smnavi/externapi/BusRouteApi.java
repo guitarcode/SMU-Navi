@@ -1,16 +1,20 @@
-package smu.poodle.smnavi.callapi;
+package smu.poodle.smnavi.externapi;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import smu.poodle.smnavi.errorcode.CommonErrorCode;
+import smu.poodle.smnavi.exception.RestApiException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.List;
 
 @Component
-public class BusRouteListAPI {
+@Slf4j
+public class BusRouteApi {
     private final String HOST_URL = "http://ws.bus.go.kr/api/rest/busRouteInfo/getStaionByRoute";
 
     /**
@@ -36,6 +40,7 @@ public class BusRouteListAPI {
             NodeList itemList = doc.getElementsByTagName("itemList");
 
             int temp;
+            //
             boolean direction = true;
 
             for (temp = 0; temp < itemList.getLength(); temp++) {
@@ -79,7 +84,8 @@ public class BusRouteListAPI {
             }
         }
         catch (Exception e){
-
+            log.error("버스 루트 검색 중 오류 발생");
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 }
