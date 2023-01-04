@@ -24,6 +24,7 @@ public class TransitRouteApi {
     private final String HOST_URL = "http://ws.bus.go.kr/api/rest/pathinfo/getPathInfoByBusNSub";
 
     private final BusRouteApi busRouteListAPI;
+    private final SubwayRouteApi subwayRouteApi;
 
     /**
      * 출발지의 좌표값을 이용해 상명대학교까지의 대중교통을 이용한 경로 반환
@@ -70,22 +71,41 @@ public class TransitRouteApi {
                         Node pNode = pathList.item(i);
                         Element pElement = (Element) pNode;
 
-                        String busName = ApiUtilMethod.getTagValue("routeNm", pElement);
-                        String from = ApiUtilMethod.getTagValue("fname", pElement);
-                        String to = ApiUtilMethod.getTagValue("tname", pElement);
 
-                        transitInfoList.add(TransitPathInfoDto.TransitInfo.builder()
-                                .type(TRANSIT.BUS)
-                                .name(busName)
-                                .from(from)
-                                .to(to)
-                                .build());
+
 
                         if (pElement.getElementsByTagName("routeId").getLength() != 0) {
+                            String busName = ApiUtilMethod.getTagValue("routeNm", pElement);
+                            String from = ApiUtilMethod.getTagValue("fname", pElement);
+                            String to = ApiUtilMethod.getTagValue("tname", pElement);
+
+                            transitInfoList.add(TransitPathInfoDto.TransitInfo.builder()
+                                    .type(TRANSIT.BUS)
+                                    .name(busName)
+                                    .from(from)
+                                    .to(to)
+                                    .build());
                             String busId = ApiUtilMethod.getTagValue("routeId", pElement);
                             busRouteListAPI.getRouteList(gpsPointList, busId, from, to);
                         } else {
-                            transitInfoList.add(new TransitPathInfoDto.TransitInfo(TRANSIT.SUBWAY, busName, from, to));
+                            String lineName = ApiUtilMethod.getTagValue("routeNm", pElement);
+                            String from = ApiUtilMethod.getTagValue("fname", pElement);
+                            String to = ApiUtilMethod.getTagValue("tname", pElement);
+
+                            String fromId = ApiUtilMethod.getTagValue("fid", pElement).substring(0,4);
+                            String toId = ApiUtilMethod.getTagValue("tid", pElement).substring(0,4);
+                            log.debug(fromId);
+
+                            TransitPathInfoDto.TransitInfo transitInfo
+                                    = TransitPathInfoDto.TransitInfo.builder()
+                                    .type(TRANSIT.SUBWAY)
+                                    .name(lineName)
+                                    .from(from)
+                                    .to(to)
+                                    .build();
+
+                            subwayRouteApi.getRouteList(transitInfo.getStationList(), gpsPointList, lineName, fromId, toId);
+                            transitInfoList.add(transitInfo);
                         }
                     }
                     int time = Integer.parseInt(ApiUtilMethod.getTagValue("time", iElement));
