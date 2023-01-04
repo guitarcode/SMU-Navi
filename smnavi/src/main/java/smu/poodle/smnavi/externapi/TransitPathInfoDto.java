@@ -3,6 +3,7 @@ package smu.poodle.smnavi.externapi;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -28,5 +29,6 @@ public class TransitPathInfoDto {
         private String name;
         private String from;
         private String to;
+        private List<String> stationList = new ArrayList<>();
     }
 }
