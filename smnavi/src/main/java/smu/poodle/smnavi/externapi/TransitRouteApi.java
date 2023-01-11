@@ -58,7 +58,7 @@ public class TransitRouteApi {
                 List<GpsPoint> gpsPointList = new ArrayList<>();
 
 
-                for(int temp = 0; temp < itemList.getLength() && temp < 5; temp++) {
+                for(int temp = 0; temp < itemList.getLength() && temp < 2; temp++) {
                     Node iNode = itemList.item(temp);
 
                     Element iElement = (Element) iNode;
@@ -72,21 +72,23 @@ public class TransitRouteApi {
                         Element pElement = (Element) pNode;
 
 
-
-
                         if (pElement.getElementsByTagName("routeId").getLength() != 0) {
                             String busName = ApiUtilMethod.getTagValue("routeNm", pElement);
                             String from = ApiUtilMethod.getTagValue("fname", pElement);
                             String to = ApiUtilMethod.getTagValue("tname", pElement);
 
-                            transitInfoList.add(TransitPathInfoDto.TransitInfo.builder()
+                            TransitPathInfoDto.TransitInfo transitInfo = TransitPathInfoDto.TransitInfo.builder()
                                     .type(TRANSIT.BUS)
                                     .name(busName)
                                     .from(from)
                                     .to(to)
-                                    .build());
+                                    .stationList(new ArrayList<>())
+                                    .gpsPointList(new ArrayList<>())
+                                    .build();
+                            transitInfoList.add(transitInfo);
                             String busId = ApiUtilMethod.getTagValue("routeId", pElement);
-                            busRouteListAPI.getRouteList(gpsPointList, busId, from, to);
+                            busRouteListAPI.getRouteList(transitInfo.getStationList(), transitInfo.getGpsPointList(), busId, from, to);
+
                         } else {
                             String lineName = ApiUtilMethod.getTagValue("routeNm", pElement);
                             String from = ApiUtilMethod.getTagValue("fname", pElement);
@@ -102,14 +104,16 @@ public class TransitRouteApi {
                                     .name(lineName)
                                     .from(from)
                                     .to(to)
+                                    .stationList(new ArrayList<>())
+                                    .gpsPointList(new ArrayList<>())
                                     .build();
 
-                            subwayRouteApi.getRouteList(transitInfo.getStationList(), gpsPointList, lineName, fromId, toId);
+                            subwayRouteApi.getRouteList(transitInfo.getStationList(), transitInfo.getGpsPointList(), lineName, fromId, toId);
                             transitInfoList.add(transitInfo);
                         }
                     }
                     int time = Integer.parseInt(ApiUtilMethod.getTagValue("time", iElement));
-                    TransitPathInfoDto pathInfo = new TransitPathInfoDto(transitInfoList, gpsPointList, time);
+                    TransitPathInfoDto pathInfo = new TransitPathInfoDto(transitInfoList, time);
                     pathInfoList.add(pathInfo);
                 }
                 return pathInfoList;

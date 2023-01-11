@@ -11,15 +11,12 @@ public class TransitPathInfoDto {
     private int transitInfoCnt;
     private List<TransitInfo> transitInfoList;
     private int gpsPointCnt;
-    private List<GpsPoint> gpsPointList;
     private int time;
 
-    public TransitPathInfoDto(List<TransitInfo> transitInfoList, List<GpsPoint> gpsPointList, int time) {
+    public TransitPathInfoDto(List<TransitInfo> transitInfoList, int time) {
         this.transitInfoList = transitInfoList;
-        this.gpsPointList = gpsPointList;
         this.time = time;
         this.transitInfoCnt = transitInfoList.size();
-        this.gpsPointCnt = gpsPointList.size();
     }
 
     @Getter
@@ -30,5 +27,7 @@ public class TransitPathInfoDto {
         private String from;
         private String to;
         private List<String> stationList = new ArrayList<>();
+        private List<GpsPoint> gpsPointList;
+
     }
 }
