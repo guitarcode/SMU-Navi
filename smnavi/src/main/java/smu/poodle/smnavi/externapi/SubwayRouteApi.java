@@ -1,11 +1,10 @@
 package smu.poodle.smnavi.externapi;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.springframework.stereotype.Component;
-import smu.poodle.smnavi.domain.SubwayStationInfo;
+import smu.poodle.smnavi.domain.StationInfo;
 import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
 import smu.poodle.smnavi.exception.RestApiException;
 
@@ -16,6 +15,7 @@ import java.net.URL;
 import org.json.JSONObject;
 import smu.poodle.smnavi.service.TransitService;
 
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -60,17 +60,17 @@ public class SubwayRouteApi {
             conn.disconnect();
 
             JSONObject allJson = new JSONObject(sb.toString());
-            JSONArray routeJson = allJson.getJSONArray("route");
+            JSONArray routeJson = allJson.getJSONObject("data").getJSONArray("route");
 
-            Map<Integer, SubwayStationInfo> subwayStationInfoMap = transitService.stationInfoMap(lineName);
+            Map<Integer, StationInfo> subwayStationInfoMap = transitService.stationInfoMap(lineName);
 
             for (int i = 0; i < routeJson.length(); i++) {
                 JSONObject obj = routeJson.getJSONObject(i);
                 String stationNum = obj.getString("station_cd");
-                SubwayStationInfo subwayStationInfo = subwayStationInfoMap.get(Integer.parseInt(stationNum));
+                StationInfo subwayStationInfo = subwayStationInfoMap.get(Integer.parseInt(stationNum));
                 GpsPoint gpsPoint = new GpsPoint(subwayStationInfo.getGpsX(),subwayStationInfo.getGpsY());
                 gpsPointList.add(gpsPoint);
-                stationList.add(obj.getString("station_nm"));
+                stationList.add(subwayStationInfo.getStationName());
             }
         }
         catch (Exception e){

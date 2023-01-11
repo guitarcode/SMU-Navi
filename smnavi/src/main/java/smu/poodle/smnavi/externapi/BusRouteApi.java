@@ -24,7 +24,7 @@ public class BusRouteApi {
      * @param from 버스 출발 정류소 이름
      * @param to 버스 도착 정류소 이름
      */
-    public void getRouteList(List<GpsPoint> gpsPointList, String busId, String from, String to){
+    public void getRouteList(List<String> stationList, List<GpsPoint> gpsPointList, String busId, String from, String to){
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(HOST_URL);
         urlBuilder.append("?serviceKey=" + Const.SERVICE_KEY);
@@ -55,7 +55,6 @@ public class BusRouteApi {
                     if(direction) {
                         String gpsX = ApiUtilMethod.getTagValue("gpsX", iElement);
                         String gpsY = ApiUtilMethod.getTagValue("gpsY", iElement);
-
                         gpsPointList.add(new GpsPoint(gpsX, gpsY));
                         break;
                     }
@@ -79,6 +78,7 @@ public class BusRouteApi {
                 String gpsX = ApiUtilMethod.getTagValue("gpsX", iElement);
                 String gpsY = ApiUtilMethod.getTagValue("gpsY", iElement);
 
+                stationList.add(stationName);
                 gpsPointList.add(new GpsPoint(gpsX, gpsY));
                 temp++;
             }

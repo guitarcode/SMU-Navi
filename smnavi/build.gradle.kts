@@ -2,6 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.0.1"
 	id("io.spring.dependency-management") version "1.1.0"
+//	id ("com.ewerk.gradle.plugins.querydsl") version "1.0.10"
 }
 
 group = "smu.poodle"
@@ -23,6 +24,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation ("org.json:json:20220924")
+//	implementation ("com.querydsl:querydsl-jpa")
+//	implementation ("com.querydsl:querydsl-apt")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.mysql:mysql-connector-j")
