@@ -2,7 +2,7 @@ package smu.poodle.smnavi.response;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import smu.poodle.smnavi.externapi.TransitPathInfoDto;
+import smu.poodle.smnavi.externapi.TransitPathDto;
 
 import java.util.List;
 
@@ -11,5 +11,5 @@ import java.util.List;
 public class TransitResponse extends BaseResponse{
 
     private final int pathInfoCnt;
-    private final List<TransitPathInfoDto> pathInfoList;
+    private final List<TransitPathDto> pathInfoList;
 }
