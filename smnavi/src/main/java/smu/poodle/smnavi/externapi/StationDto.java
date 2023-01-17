@@ -9,7 +9,7 @@ import smu.poodle.smnavi.domain.Station;
 @Builder
 @AllArgsConstructor
 public class StationDto {
-    private int stationId;
+    private String stationId;
     private String name;
     private String gpsX;
     private String gpsY;
@@ -18,8 +18,8 @@ public class StationDto {
         return Station.builder()
                 .id(this.stationId)
                 .name(this.name)
-                .startX(this.gpsX)
-                .startY(this.gpsY)
+                .x(this.gpsX)
+                .y(this.gpsY)
                 .build();
     }
 }

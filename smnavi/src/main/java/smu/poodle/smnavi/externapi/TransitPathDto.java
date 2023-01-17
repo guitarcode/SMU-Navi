@@ -1,12 +1,16 @@
 package smu.poodle.smnavi.externapi;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TransitPathDto {
     private int transitInfoCnt;
     private List<TransitSubPathDto> subPathList;

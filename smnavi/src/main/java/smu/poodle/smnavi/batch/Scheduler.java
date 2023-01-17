@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class Scheduler {
 
-    @Scheduled(cron="0/10 * * * * *")
+//    @Scheduled(cron="0/10 * * * * *")
     public void test2() {
             System.out.println("@Scheduled annotation : 10초에 1번씩 console 찍기");
 

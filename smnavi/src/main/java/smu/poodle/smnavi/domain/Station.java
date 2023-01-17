@@ -1,27 +1,36 @@
 package smu.poodle.smnavi.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Table(name = "stations")
 public class Station {
     @Id
-    @Column(name = "station_id")
-    private int id;
+    @Column(name = "stationId")
+    private String id;
 
     private String name;
-    private String number;
-    private int index;
 
-    private String startX;
-    private String startY;
+    private String x;
+    private String y;
+
+    @OneToMany(mappedBy = "src")
+    private List<Edge> nextEdges = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dst")
+    private List<Edge> dstEdges = new ArrayList<>();
+
+
 }
