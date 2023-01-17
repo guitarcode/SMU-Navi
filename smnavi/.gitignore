@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### api key, setting yaml ###
-/src/main/resources/*.yml
+*.yml
