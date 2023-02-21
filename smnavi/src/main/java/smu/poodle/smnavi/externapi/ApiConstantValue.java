@@ -17,4 +17,6 @@ public class ApiConstantValue {
     private String seoulDataApiKey;
     @Value("${ODSAY-API-KEY}")
     private String odsayApiKey;
+    @Value("${GPS-CONVERT-API-KEY}")
+    private String gpsConvertApiKey;
 }
