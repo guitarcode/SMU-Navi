@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class TransitRouteApi {
 
     private final TransitRepository transitRepository;
+    private final RouteDetailPositionApi routeDetailPositionApi;
     private final ApiConstantValue apiConstantValue;
     private final String HOST_URL = "https://api.odsay.com/v1/api/searchPubTransPathT";
 
@@ -44,14 +45,14 @@ public class TransitRouteApi {
 
         for (TransitPathDto transitPathDto : transitPathDtoList) {
             List<TransitSubPathDto> transitSubPathDtoList = transitPathDto.getSubPathList();
-            List<Edge> edgeList = new ArrayList<>();
+            List<List<Edge>> edgeLists = new ArrayList<>();
 
             int time = transitPathDto.getTime();
 
             StationDto preStationDto = null;
             for (TransitSubPathDto transitSubPathDto : transitSubPathDtoList) {
                 List<StationDto> stationDtoList = transitSubPathDto.getStationList();
-
+                List<Edge> edgeList = new ArrayList<>();
                 transitRepository.saveStations(stationDtoList.stream()
                         .map(StationDto::toEntity)
                         .collect(Collectors.toList()));
@@ -65,13 +66,21 @@ public class TransitRouteApi {
                     }
                     preStationDto = stationDto;
                 }
+                edgeLists.add(edgeList);
+            }
 
+            String[] mapObjArr = transitPathDto.getMapObj().split("@");
+            for (int i = 0; i < edgeLists.size(); i++) {
+                List<Edge> edgeList = edgeLists.get(i);
+                boolean b = transitRepository.saveEdges(edgeList);
+                if(b){
+                    routeDetailPositionApi.makeDetailPositionList(transitPathDto.getSubPathList().get(i)
+                            , mapObjArr[i], edgeList);
+                    Route route = transitRepository.saveRoute(edgeList.get(0).getSrc(), time);
+                    transitRepository.saveRouteInfo(edgeList,route);
+                }
             }
-            boolean b = transitRepository.saveEdges(edgeList);
-            if(b){
-                Route route = transitRepository.saveRoute(edgeList.get(0).getSrc(), time);
-                transitRepository.saveRouteInfo(edgeList,route);
-            }
+
 
         }
 
@@ -85,11 +94,15 @@ public class TransitRouteApi {
             JSONObject path = pathList.getJSONObject(i);
             JSONObject pathInfo = path.getJSONObject("info");
             int time = pathInfo.getInt("totalTime");
+
+            String mapObj = pathInfo.getString("mapObj");
+
             List<TransitSubPathDto> transitSubPathDtoList = makeSubPathDtoList(path);
 
             transitPathDtoList.add(TransitPathDto.builder()
                     .subPathList(transitSubPathDtoList)
                     .time(time)
+                    .mapObj(mapObj)
                     .build());
         }
         return transitPathDtoList;

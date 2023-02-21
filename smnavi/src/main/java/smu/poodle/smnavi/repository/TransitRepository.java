@@ -113,7 +113,6 @@ public class TransitRepository {
             isNewRoute = saveEdgeWhenInternalBranch(edgeList.subList(idx, edgeList.size()), isNewRoute);
         }
 
-
         em.flush();
         return isNewRoute;
     }
@@ -135,5 +134,22 @@ public class TransitRepository {
         }
 
         return isNewRoute;
+    }
+
+    public List<DetailPosition> findDetailPositionByEdge(Edge edge){
+        return em.createQuery("select DetailPosition from Edge as e " +
+                "where e.id = :id", DetailPosition.class)
+                .setParameter("id", edge.getId())
+                .getResultList();
+    }
+    public void saveDetailPositions(List<DetailPosition> detailPositionList){
+//        List<DetailPosition> detailPositions = findDetailPositionByEdge(detailPositionList.get(0).getEdge());
+
+//        if(detailPositions.isEmpty()) {
+            for (DetailPosition detailPosition : detailPositionList) {
+                em.persist(detailPosition);
+            }
+            em.flush();
+//        }
     }
 }

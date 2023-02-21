@@ -1,5 +1,6 @@
 package smu.poodle.smnavi.externapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,9 @@ public class TransitPathDto {
     private int transitInfoCnt;
     private List<TransitSubPathDto> subPathList;
     private int time;
+
+    @JsonIgnore
+    private String mapObj;
 
     public TransitPathDto(List<TransitSubPathDto> transitInfoList, int time) {
         this.subPathList = transitInfoList;
