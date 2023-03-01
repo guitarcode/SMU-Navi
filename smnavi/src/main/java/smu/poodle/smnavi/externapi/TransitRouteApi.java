@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.domain.Edge;
 import smu.poodle.smnavi.domain.Route;
+import smu.poodle.smnavi.domain.Station;
 import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
 import smu.poodle.smnavi.repository.TransitRepository;
 
@@ -49,38 +50,48 @@ public class TransitRouteApi {
 
             int time = transitPathDto.getTime();
 
-            StationDto preStationDto = null;
             for (TransitSubPathDto transitSubPathDto : transitSubPathDtoList) {
+                
+                Station preStation = null;
+                
                 List<StationDto> stationDtoList = transitSubPathDto.getStationList();
-                List<Edge> edgeList = new ArrayList<>();
-                transitRepository.saveStations(stationDtoList.stream()
+                List<Station> stationList = stationDtoList.stream()
                         .map(StationDto::toEntity)
-                        .collect(Collectors.toList()));
-                for (StationDto stationDto : stationDtoList) {
-                    if(preStationDto != null) {
+                        .collect(Collectors.toList());
+                transitRepository.saveStations(stationList);
+
+                List<Edge> edgeList = new ArrayList<>();
+                for (Station station : stationList) {
+                    if(preStation != null) {
                         Edge edge = Edge.builder()
-                                .src(preStationDto.toEntity())
-                                .dst(stationDto.toEntity())
+                                .src(preStation)
+                                .dst(station)
                                 .build();
                         edgeList.add(edge);
                     }
-                    preStationDto = stationDto;
-                }
+                    preStation = station;
+                } 
                 edgeLists.add(edgeList);
             }
 
             String[] mapObjArr = transitPathDto.getMapObj().split("@");
+            boolean b = true;
+            List<Edge> entireEdgeList = new ArrayList<>();
             for (int i = 0; i < edgeLists.size(); i++) {
                 List<Edge> edgeList = edgeLists.get(i);
-                boolean b = transitRepository.saveEdges(edgeList);
-                if(b){
-                    routeDetailPositionApi.makeDetailPositionList(transitPathDto.getSubPathList().get(i)
-                            , mapObjArr[i], edgeList);
-                    Route route = transitRepository.saveRoute(edgeList.get(0).getSrc(), time);
-                    transitRepository.saveRouteInfo(edgeList,route);
-                }
-            }
+                List<Edge> persistedEdgeList = transitRepository.saveEdges(edgeList);
+                entireEdgeList.addAll(persistedEdgeList);
+                routeDetailPositionApi
+                        .makeDetailPositionList(
+                            transitPathDto.getSubPathList().get(i),
+                            mapObjArr[i],
+                            persistedEdgeList);
 
+            }
+            if(b) {
+                Route route = transitRepository.saveRoute(entireEdgeList.get(0).getSrc(), time);
+                transitRepository.saveRouteInfo(entireEdgeList, route);
+            }
 
         }
 

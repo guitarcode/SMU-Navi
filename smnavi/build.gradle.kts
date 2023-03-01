@@ -25,6 +25,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation ("org.json:json:20220924")
 	implementation ("org.springframework.boot:spring-boot-starter-batch")
+    implementation("junit:junit:4.13.1")
 //	implementation ("com.querydsl:querydsl-jpa")
 //	implementation ("com.querydsl:querydsl-apt")
 	compileOnly("org.projectlombok:lombok")
