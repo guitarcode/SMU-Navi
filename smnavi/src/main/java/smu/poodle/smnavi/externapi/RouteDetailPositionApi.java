@@ -64,7 +64,7 @@ public class RouteDetailPositionApi {
                 JSONObject pos = posArray.getJSONObject(posIdx);
                 GpsPoint detailPos = new GpsPoint(pos.getBigDecimal("x").toString(), pos.getBigDecimal("y").toString());
 
-                if(!isEmpty) {
+                if(isEmpty) {
                     detailPositionList.add(DetailPosition.builder()
                             .x(detailPos.getGpsX())
                             .y(detailPos.getGpsY())

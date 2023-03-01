@@ -44,7 +44,8 @@ public class TransitRouteApi {
 
     private void makeEdgeAndRoute(List<TransitPathDto> transitPathDtoList) {
 
-        for (TransitPathDto transitPathDto : transitPathDtoList) {
+//        for (TransitPathDto transitPathDto : transitPathDtoList) {
+        TransitPathDto transitPathDto = transitPathDtoList.get(0);
             List<TransitSubPathDto> transitSubPathDtoList = transitPathDto.getSubPathList();
             List<List<Edge>> edgeLists = new ArrayList<>();
 
@@ -93,7 +94,6 @@ public class TransitRouteApi {
                 transitRepository.saveRouteInfo(entireEdgeList, route);
             }
 
-        }
 
     }
 
