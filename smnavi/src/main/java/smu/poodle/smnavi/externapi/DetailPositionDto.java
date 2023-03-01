@@ -5,11 +5,11 @@ import smu.poodle.smnavi.domain.DetailPosition;
 
 @Data
 public class DetailPositionDto {
-    private String x;
-    private String y;
+    private String gpsX;
+    private String gpsY;
 
     public DetailPositionDto(DetailPosition detailPosition) {
-        this.x = detailPosition.getX();
-        this.y = detailPosition.getY();
+        this.gpsX = detailPosition.getX();
+        this.gpsY = detailPosition.getY();
     }
 }

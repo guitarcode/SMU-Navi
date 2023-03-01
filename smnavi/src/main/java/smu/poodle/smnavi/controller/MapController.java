@@ -40,10 +40,14 @@ public class MapController {
 
     @GetMapping("/api/test")
     public ResponseEntity<HttpStatus> getGps() throws ParserConfigurationException, IOException, SAXException {
-        accidentApi.getAccidentInfo();
+        GpsPoint gpsPoint = new GpsPoint("127.056991", "37.637792");
+        GpsPoint editedgpsPoint = new GpsPoint("127.056", "37.637");
 
+        //when
+        accidentApi.updateAccidentInfo(gpsPoint,editedgpsPoint);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 
 }
 

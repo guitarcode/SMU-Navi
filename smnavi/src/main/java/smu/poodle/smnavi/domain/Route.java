@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,7 +20,16 @@ public class Route {
 
     private Integer time;
 
+    private String accidentInfo;
+
+    @OneToMany(mappedBy = "route")
+    List<RouteInfo> routeInfos;
+
     @ManyToOne
     @JoinColumn(name = "startStationId")
     private Station startStation;
+
+    public void updateAccident(){
+        accidentInfo = "사고가 발생했습니다.";
+    }
 }

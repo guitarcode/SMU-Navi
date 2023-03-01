@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Entity
 @Builder
@@ -26,6 +28,9 @@ public class Edge {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dst_id")
     private Station dst;
+
+    @OneToMany(mappedBy = "edge")
+    private List<RouteInfo> routeInfoList;
 
     public void setDst(Station dst) {
         this.dst = dst;
