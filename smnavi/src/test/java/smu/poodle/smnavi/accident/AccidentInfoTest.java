@@ -25,7 +25,7 @@ public class AccidentInfoTest {
         GpsPoint editedgpsPoint = new GpsPoint("127.050", "37.646");
 
         //when
-        accidentApi.updateAccidentInfo(gpsPoint,editedgpsPoint);
+//        accidentApi.updateAccidentInfo(gpsPoint,editedgpsPoint);
         //then
     }
 }

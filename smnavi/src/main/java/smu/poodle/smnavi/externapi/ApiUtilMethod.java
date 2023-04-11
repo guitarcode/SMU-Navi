@@ -1,11 +1,15 @@
 package smu.poodle.smnavi.externapi;
 
 import org.json.JSONObject;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import smu.poodle.smnavi.errorcode.CommonErrorCode;
 import smu.poodle.smnavi.errorcode.ErrorCode;
 import smu.poodle.smnavi.exception.RestApiException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -77,5 +81,43 @@ public class ApiUtilMethod {
         }
 
         return result;
+    }
+
+    public static double calculateDistance(GpsPoint gpsPoint1, GpsPoint gpsPoint2) {
+        double lat1 = Double.parseDouble(gpsPoint1.getGpsX());
+        double lon1 = Double.parseDouble(gpsPoint1.getGpsY());
+        double lat2 = Double.parseDouble(gpsPoint2.getGpsX());
+        double lon2 = Double.parseDouble(gpsPoint2.getGpsY());
+        int earthRadius = 6371000; // 지구 반지름 (미터)
+
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+
+        double a = Math.pow(Math.sin(dLat / 2), 2) +
+                Math.pow(Math.sin(dLon / 2), 2) *
+                        Math.cos(lat1) *
+                        Math.cos(lat2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+
+        return earthRadius * c;
+    }
+
+    public static Document callXmlApi(String url){
+        try {
+            DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
+            Document xmlContent = dBuilder.parse(url);
+
+            xmlContent.getDocumentElement().normalize();
+
+            return xmlContent;
+        }
+        catch (Exception e){
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

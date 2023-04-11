@@ -22,10 +22,19 @@ public class TransitRepository {
                 .getResultList();
     }
 
+    public List<Station> findStationByLocalStationIdAndBusName(String localStationId, String busName){
+        return em.createQuery("select s " +
+                "from Station s " +
+                "where s.localStationId = :stationId " +
+                "and s.busName = :busName", Station.class)
+                .setParameter("stationId", localStationId)
+                .setParameter("busName", busName)
+                .getResultList();
+    }
     public void saveStations(List<Station> stationList){
         for (Station station : stationList) {
-            Station findedStation = em.find(Station.class, station.getId());
-            if(findedStation == null){
+            List<Station> findedStation = findStationByLocalStationIdAndBusName(station.getLocalStationId(), station.getBusName());
+            if(findedStation.isEmpty()){
                 em.persist(station);
             }
         }
@@ -34,7 +43,6 @@ public class TransitRepository {
 
     //쿼리
     public List<Edge> saveEdges(List<Edge> edgeList){
-        boolean isNewRoute = false;
         List<Edge> persistedEdgeList = new ArrayList<>();
         for (Edge edge : edgeList) {
             List<Edge> sameEdge = em.createQuery("select e from Edge as e " +
@@ -47,7 +55,6 @@ public class TransitRepository {
             if(sameEdge.isEmpty()){
                 em.persist(edge);
                 persistedEdgeList.add(edge);
-                isNewRoute = true;
             }
             else{
                 persistedEdgeList.add(sameEdge.get(0));
@@ -63,6 +70,7 @@ public class TransitRepository {
         Route route = Route.builder()
                 .time(time)
                 .startStation(startStation)
+                .isSeen(false)
                 .build();
         em.persist(route);
 
@@ -70,12 +78,36 @@ public class TransitRepository {
         return route;
     }
 
-    public void saveRouteInfo(List<Edge> edgeList, Route route){
+    public List<Route> findRouteByEdgeList(List<Edge> edgeList){
+        List<Route> resultList = em.createQuery("select r.route " +
+                        "from RouteInfo r " +
+                        "inner join Edge as e on e = r.edge " +
+                        "where e in :edges " +
+                        "group by r.route.id " +
+                        "having count(r.edge) = :num ", Route.class)
+                .setParameter("edges", edgeList)
+                .setParameter("num", edgeList.size())
+                .getResultList();
+        for (Route route : resultList) {
+            List<RouteInfo> routeInfo = em.createQuery("select r " +
+                            "from RouteInfo r " +
+                            "where r.route = :route", RouteInfo.class)
+                    .setParameter("route", route)
+                    .getResultList();
+            if(edgeList.size() == routeInfo.size()){
+                return resultList;
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    public void saveRouteInfo(List<Edge> edgeList, Route route, boolean isMain){
         for (Edge edge : edgeList) {
 
             RouteInfo routeInfo = RouteInfo.builder()
                     .route(route)
                     .edge(edge)
+                    .isMain(isMain)
                     .build();
 
             em.persist(routeInfo);
@@ -83,64 +115,14 @@ public class TransitRepository {
         em.flush();
     }
 
-//    private List<Edge> findNextEdge(Station dstStation){
-//        return em.createQuery("select e from Edge as e " +
-//                        "join fetch e.src s " +
-//                        "join fetch e.dst d " +
-//                        "where s.id = :dstId", Edge.class)
-//                .setParameter("dstId", dstStation.getId())
-//                .getResultList();
-//    }
-//
-//    private List<Edge> findFirstEdge(Station dstStation){
-//        return em.createQuery("select e from Edge as e " +
-//                        "join fetch e.src s " +
-//                        "join fetch e.dst d " +
-//                        "where d.id = :dstId", Edge.class)
-//                .setParameter("dstId", dstStation.getId())
-//                .getResultList();
-//    }
-
-//    private boolean saveEdgeWhenExternalBranch(List<Edge> edgeList, boolean isNewRoute){
-//        int idx;
-//        for (idx = 0; idx < edgeList.size(); idx++) {
-//            Edge edge = edgeList.get(idx);
-//            List<Edge> resultList = findNextEdge(edge.getDst());
-//            if (!resultList.isEmpty()) {
-//                edge.setDst(resultList.get(0).getSrc());
-//                em.persist(edge);
-//                break;
-//            } else {
-//                em.persist(edge);
-//                isNewRoute = true;
-//            }
-//        }
-//        if(idx < edgeList.size()) {
-//            isNewRoute = saveEdgeWhenInternalBranch(edgeList.subList(idx, edgeList.size()), isNewRoute);
+//    public void saveRouteInfo(List<RouteInfo> routeInfoList){
+//        for (RouteInfo routeInfo : routeInfoList) {
+//            em.persist(routeInfo);
 //        }
 //
 //        em.flush();
-//        return isNewRoute;
 //    }
 
-//    private boolean saveEdgeWhenInternalBranch(List<Edge> edgeList, boolean isNewRoute){
-//        int idx;
-//        for (idx = 0; idx < edgeList.size(); idx++) {
-//            Edge edge = edgeList.get(idx);
-//            List<Edge> resultList = findFirstEdge(edge.getDst());
-//            if(resultList.isEmpty())
-//                break;
-//            else{
-//                edgeList.set(idx, resultList.get(0));
-//            }
-//        }
-//
-//        if(idx < edgeList.size()) {
-//            isNewRoute = saveEdgeWhenExternalBranch(edgeList.subList(idx, edgeList.size()), isNewRoute);
-//        }
-//
-//        return isNewRoute;
-//    }
 
 
     public void saveDetailPositions(List<DetailPosition> detailPositionList) {
@@ -170,8 +152,44 @@ public class TransitRepository {
 
     }
 
-//    public List<Edge> findAllEdgeById(List<Long> id){
-//        return em.createQuery("select e from Edge e " +
-//                "where ");
-//    }
+    public List<Route> findAllRouteSeenTrue() {
+        return em.createQuery("select r " +
+                "from Route as r " +
+                "join fetch r.startStation " +
+                "where r.isSeen = TRUE", Route.class)
+                .getResultList();
+    }
+
+    public Route findRouteById(Long routeId) {
+        return em.createQuery("select r " +
+                        "from Route as r " +
+                        "join fetch r.startStation " +
+                        "where r.id = : id ", Route.class)
+                .setParameter("id", routeId)
+                .getSingleResult();
+    }
+
+    public List<Route> findRouteByStartStationId(String startStationId) {
+        return em.createQuery("select r " +
+                        "from Route as r " +
+                        "join fetch r.startStation " +
+                        "where r.startStation.localStationId = :id ", Route.class)
+                .setParameter("id", startStationId)
+                .getResultList();
+    }
+    public List<RouteInfo> findRouteInfoByRoute(Route route) {
+        return em.createQuery("select ri " +
+                        "from RouteInfo as ri " +
+                        "join fetch ri.edge as e " +
+                        "join fetch e.src " +
+                        "join fetch e.dst " +
+                        "where ri.route = :route", RouteInfo.class)
+                .setParameter("route", route)
+                .getResultList();
+    }
+
+
+    public void saveBusRouteInfo(BusRouteInfo busRouteInfo) {
+        em.persist(busRouteInfo);
+    }
 }

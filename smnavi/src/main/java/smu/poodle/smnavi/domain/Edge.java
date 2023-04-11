@@ -21,6 +21,8 @@ public class Edge {
     @Column(name = "edge_id")
     private Integer id;
 
+    private boolean detailExist;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "src_id")
     private Station src;
@@ -32,7 +34,14 @@ public class Edge {
     @OneToMany(mappedBy = "edge")
     private List<RouteInfo> routeInfoList;
 
+    @OneToMany(mappedBy = "edge")
+    private List<DetailPosition> detailPositionList;
+
     public void setDst(Station dst) {
         this.dst = dst;
+    }
+
+    public void setDetailExistTrue(){
+        this.detailExist = true;
     }
 }
