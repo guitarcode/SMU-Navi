@@ -18,6 +18,7 @@ public class RouteInfo {
     @Column(name = "route_info_id")
     private Integer id;
 
+    private boolean isMain;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Edge edge;
 

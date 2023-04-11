@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransitPathDto {
-    private int transitInfoCnt;
     private List<TransitSubPathDto> subPathList;
     private int time;
 
@@ -23,6 +22,5 @@ public class TransitPathDto {
     public TransitPathDto(List<TransitSubPathDto> transitInfoList, int time) {
         this.subPathList = transitInfoList;
         this.time = time;
-        this.transitInfoCnt = transitInfoList.size();
     }
 }

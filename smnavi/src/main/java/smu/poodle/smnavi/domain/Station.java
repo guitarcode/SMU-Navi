@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import smu.poodle.smnavi.externapi.TransitType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +19,18 @@ import java.util.List;
 @Table(name = "stations")
 public class Station {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stationId")
-    private String id;
+    private Long id;
 
-    private String name;
+    private String localStationId;
 
+    private String busName;
+    private String stationName;
+
+
+    @Enumerated(value = EnumType.STRING)
+    private TransitType type;
     private String x;
     private String y;
 

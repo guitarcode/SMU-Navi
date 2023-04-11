@@ -1,5 +1,6 @@
 package smu.poodle.smnavi.externapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,8 @@ public class TransitSubPathDto {
 
     private int sectionTime;
     private List<StationDto> stationList;
+
+    @JsonIgnore
     private List<DetailPositionDto> gpsDetail;
 
 }

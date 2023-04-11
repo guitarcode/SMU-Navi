@@ -9,17 +9,20 @@ import smu.poodle.smnavi.domain.Station;
 @Builder
 @AllArgsConstructor
 public class StationDto {
-    private String stationId;
-    private String name;
+    private String localStationId;
+    private String busName;
+    private String stationName;
     private String gpsX;
     private String gpsY;
 
-    public Station toEntity() {
+    public Station toEntity(TransitType type) {
         return Station.builder()
-                .id(this.stationId)
-                .name(this.name)
+                .localStationId(this.localStationId)
+                .busName(this.busName)
+                .stationName(this.stationName)
                 .x(this.gpsX)
                 .y(this.gpsY)
+                .type(type)
                 .build();
     }
 }

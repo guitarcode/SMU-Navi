@@ -16,11 +16,13 @@ import java.util.List;
 public class Route {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "route_id")
-    private Integer id;
+    private Long id;
 
     private Integer time;
 
     private String accidentInfo;
+
+    private Boolean isSeen;
 
     @OneToMany(mappedBy = "route")
     List<RouteInfo> routeInfos;
@@ -29,7 +31,11 @@ public class Route {
     @JoinColumn(name = "startStationId")
     private Station startStation;
 
-    public void updateAccident(){
-        accidentInfo = "사고가 발생했습니다.";
+    public void updateAccident(String accidentInfo){
+        this.accidentInfo = accidentInfo;
+    }
+
+    public void updateIsSeen(){
+        this.isSeen = !this.isSeen;
     }
 }

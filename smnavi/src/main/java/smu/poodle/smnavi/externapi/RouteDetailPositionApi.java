@@ -23,6 +23,14 @@ public class RouteDetailPositionApi {
     private final ApiConstantValue apiConstantValue;
 
     public void makeDetailPositionList(TransitSubPathDto transitSubPathDto, String mapObj, List<Edge> edges){
+        boolean detailExist = true;
+        for (Edge edge : edges) {
+            detailExist = detailExist & edge.isDetailExist();
+        }
+        if(detailExist) {
+            return;
+        }
+
         JSONObject jsonObject = ApiUtilMethod.urlBuildWithJson(HOST_URL,
                 ExternApiErrorCode.UNSUPPORTED_OR_INVALID_GPS_POINTS,
                 new ApiKeyValue("apiKey",apiConstantValue.getOdsayApiKey()),
@@ -65,6 +73,7 @@ public class RouteDetailPositionApi {
                 GpsPoint detailPos = new GpsPoint(pos.getBigDecimal("x").toString(), pos.getBigDecimal("y").toString());
 
                 if(isEmpty) {
+                    edge.setDetailExistTrue();
                     detailPositionList.add(DetailPosition.builder()
                             .x(detailPos.getGpsX())
                             .y(detailPos.getGpsY())
@@ -93,6 +102,7 @@ public class RouteDetailPositionApi {
                 while (posIdx < posArray.length()) {
                     JSONObject pos = posArray.getJSONObject(posIdx);
                     GpsPoint detailPos = new GpsPoint(pos.getBigDecimal("x").toString(), pos.getBigDecimal("y").toString());
+                    edge.setDetailExistTrue();
                     DetailPosition curDetailPosition = DetailPosition.builder()
                             .x(detailPos.getGpsX())
                             .y(detailPos.getGpsY())
