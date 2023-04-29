@@ -16,10 +16,12 @@ public class TransitSubPathDto {
     private String from;
     private String to;
 
+
     private int sectionTime;
+    //출발역 목록
     private List<StationDto> stationList;
 
-    @JsonIgnore
+    //상세 좌표
     private List<DetailPositionDto> gpsDetail;
 
 }

@@ -51,6 +51,7 @@ public class TransitRouteApi {
         return pathInfoList;
     }
 
+    //1번
     public List<TransitPathDto> getTransitRoute(String startStationId) {
         List<TransitPathDto> pathInfoList = new ArrayList<>();
 
@@ -61,6 +62,7 @@ public class TransitRouteApi {
                 TransitPathDto transitPathDto = convertRouteInfoToDto(routeInfoList, route.getTime());
                 pathInfoList.add(transitPathDto);
         }
+
 
         return pathInfoList;
     }
@@ -133,6 +135,7 @@ public class TransitRouteApi {
         return TransitPathDto.builder()
                 .subPathList(subPathDto)
                 .time(time)
+                .subPathCnt(subPathDto.size())
                 .build();
     }
 
@@ -175,7 +178,7 @@ public class TransitRouteApi {
                 List<Station> stationList = stationDtoList.stream()
                         .map(dto -> dto.toEntity(transitSubPathDto.getType()))
                         .collect(Collectors.toList());
-                transitRepository.saveStations(stationList);
+                stationList = transitRepository.saveStations(stationList);
 
                 List<Edge> edgeList = new ArrayList<>();
                 for (Station station : stationList) {

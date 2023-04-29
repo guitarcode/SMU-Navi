@@ -31,14 +31,21 @@ public class TransitRepository {
                 .setParameter("busName", busName)
                 .getResultList();
     }
-    public void saveStations(List<Station> stationList){
+    public List<Station> saveStations(List<Station> stationList){
+        List<Station> persistedStationList = new ArrayList<>();
         for (Station station : stationList) {
             List<Station> findedStation = findStationByLocalStationIdAndBusName(station.getLocalStationId(), station.getBusName());
             if(findedStation.isEmpty()){
                 em.persist(station);
+                persistedStationList.add(station);
+            }
+            else{
+                persistedStationList.add(findedStation.get(0));
             }
         }
         em.flush();
+
+        return persistedStationList;
     }
 
     //쿼리

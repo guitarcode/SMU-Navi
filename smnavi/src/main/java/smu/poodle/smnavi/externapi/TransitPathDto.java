@@ -13,8 +13,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransitPathDto {
+    //환승 경로를 각각의 Dto로 분리
     private List<TransitSubPathDto> subPathList;
     private int time;
+
+    private int subPathCnt;
 
     @JsonIgnore
     private String mapObj;

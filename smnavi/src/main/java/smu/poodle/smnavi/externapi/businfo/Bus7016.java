@@ -2,7 +2,6 @@ package smu.poodle.smnavi.externapi.businfo;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import smu.poodle.smnavi.domain.Route;
@@ -30,9 +29,7 @@ public class Bus7016 {
     private final String g_Y = "37.5776713863";
 
 
-//    @Scheduled(cron = "0 0/3 * * * *")
     public void createInfo() {
-
         createNamyeongInfo();
 
         createSeoulStationInfo();
