@@ -63,6 +63,7 @@ public class MapController {
         TransitResponse transitResponse = TransitResponse.builder()
                 .message("정상적으로 경로를 불러왔습니다.")
                 .pathInfoList(transitRoute)
+                .pathInfoCnt(transitRoute.size())
                 .build();
 
 
