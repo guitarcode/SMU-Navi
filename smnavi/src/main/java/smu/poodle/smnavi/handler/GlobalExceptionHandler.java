@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import smu.poodle.smnavi.errorcode.ErrorCode;
 import smu.poodle.smnavi.exception.RestApiException;
-import smu.poodle.smnavi.response.ErrorResponse;
+import smu.poodle.smnavi.map.response.ErrorResponse;
 
 import java.util.List;
 import java.util.stream.Collectors;

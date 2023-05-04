@@ -1,14 +1,12 @@
 package smu.poodle.smnavi.accident;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import smu.poodle.smnavi.externapi.GpsPoint;
-import smu.poodle.smnavi.externapi.accident.AccidentApi;
-import smu.poodle.smnavi.repository.TransitRepository;
+import smu.poodle.smnavi.map.externapi.GpsPoint;
+import smu.poodle.smnavi.map.externapi.accident.AccidentApi;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
