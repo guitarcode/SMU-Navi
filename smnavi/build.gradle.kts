@@ -26,6 +26,9 @@ dependencies {
 	implementation ("org.json:json:20220924")
 	implementation ("org.springframework.boot:spring-boot-starter-batch")
     implementation("junit:junit:4.13.1")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation ("org.springframework.boot:spring-boot-starter-validation")
+
 //	implementation ("com.querydsl:querydsl-jpa")
 //	implementation ("com.querydsl:querydsl-apt")
 	compileOnly("org.projectlombok:lombok")
