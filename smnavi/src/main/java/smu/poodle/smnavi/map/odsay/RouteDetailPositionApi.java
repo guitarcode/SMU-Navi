@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi;
+package smu.poodle.smnavi.map.odsay;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
@@ -8,6 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.map.domain.DetailPosition;
 import smu.poodle.smnavi.map.domain.Edge;
 import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
+import smu.poodle.smnavi.map.dto.DetailPositionDto;
+import smu.poodle.smnavi.map.dto.TransitSubPathDto;
+import smu.poodle.smnavi.map.externapi.ApiConstantValue;
+import smu.poodle.smnavi.map.externapi.ApiKeyValue;
+import smu.poodle.smnavi.map.externapi.ApiUtilMethod;
+import smu.poodle.smnavi.map.externapi.GpsPoint;
 import smu.poodle.smnavi.map.repository.TransitRepository;
 
 import java.util.ArrayList;

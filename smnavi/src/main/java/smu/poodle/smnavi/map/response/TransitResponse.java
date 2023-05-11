@@ -2,7 +2,7 @@ package smu.poodle.smnavi.map.response;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import smu.poodle.smnavi.map.externapi.TransitPathDto;
+import smu.poodle.smnavi.map.dto.TransitPathDto;
 
 import java.util.List;
 

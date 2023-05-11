@@ -1,9 +1,10 @@
-package smu.poodle.smnavi.map.externapi;
+package smu.poodle.smnavi.map.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import smu.poodle.smnavi.map.domain.Station;
+import smu.poodle.smnavi.map.externapi.TransitType;
 
 @Getter
 @Builder

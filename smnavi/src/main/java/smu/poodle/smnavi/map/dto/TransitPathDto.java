@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi;
+package smu.poodle.smnavi.map.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

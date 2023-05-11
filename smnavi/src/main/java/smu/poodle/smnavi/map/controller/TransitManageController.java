@@ -1,0 +1,48 @@
+package smu.poodle.smnavi.map.controller;
+
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import smu.poodle.smnavi.map.dto.TransitPathDto;
+import smu.poodle.smnavi.map.odsay.TransitRouteApi;
+import smu.poodle.smnavi.map.response.BaseResponse;
+import smu.poodle.smnavi.map.response.TransitResponse;
+import smu.poodle.smnavi.map.service.TransitService;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+public class TransitManageController {
+    private final TransitRouteApi transitRouteApi;
+
+    private final TransitService transitService;
+
+    //odsay api 호출해서 api 만드는 요청
+    @PostMapping("/api/map/transit")
+    public ResponseEntity<BaseResponse> saveTransit(@RequestParam String startX, @RequestParam String startY
+            , @RequestParam String numbers){
+
+        List<TransitPathDto> transitRoute = transitRouteApi.getTransitRoute(startX, startY, numbers);
+
+        TransitResponse transitResponse = TransitResponse.builder()
+                .message("정상적으로 경로를 불러왔습니다.")
+                .pathInfoList(transitRoute)
+                .build();
+
+        return new ResponseEntity<>(transitResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/route/seen/{id}")
+    public ResponseEntity<HttpStatus> getRouteList(@PathVariable Long id){
+        transitService.updateRouteSeen(id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+}
