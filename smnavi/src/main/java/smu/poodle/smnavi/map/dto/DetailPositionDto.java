@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi;
+package smu.poodle.smnavi.map.dto;
 
 import lombok.Data;
 import smu.poodle.smnavi.map.domain.DetailPosition;

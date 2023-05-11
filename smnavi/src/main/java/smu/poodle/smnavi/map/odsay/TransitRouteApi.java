@@ -1,4 +1,4 @@
-package smu.poodle.smnavi.map.externapi;
+package smu.poodle.smnavi.map.odsay;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
@@ -10,12 +10,19 @@ import smu.poodle.smnavi.map.domain.Route;
 import smu.poodle.smnavi.map.domain.RouteInfo;
 import smu.poodle.smnavi.map.domain.Station;
 import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
+import smu.poodle.smnavi.map.dto.DetailPositionDto;
+import smu.poodle.smnavi.map.dto.StationDto;
+import smu.poodle.smnavi.map.dto.TransitPathDto;
+import smu.poodle.smnavi.map.dto.TransitSubPathDto;
+import smu.poodle.smnavi.map.externapi.*;
 import smu.poodle.smnavi.map.repository.TransitRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
+
+import static smu.poodle.smnavi.map.util.ConvertDtoUtil.convertRouteInfoToDto;
 
 @Component
 @RequiredArgsConstructor
@@ -27,115 +34,7 @@ public class TransitRouteApi {
     private final ApiConstantValue apiConstantValue;
     private final String HOST_URL = "https://api.odsay.com/v1/api/searchPubTransPathT";
 
-    public List<TransitPathDto> getTransitRoute(String startX, String startY) {
-        List<TransitPathDto> pathInfoList = new ArrayList<>();
 
-        List<Route> routeList = transitRepository.findAllRouteSeenTrue();
-        GpsPoint gpsPoint = new GpsPoint(startX, startY);
-
-        for (Route route : routeList) {
-            GpsPoint startPoint = new GpsPoint(route.getStartStation().getX(), route.getStartStation().getY());
-            double distance = ApiUtilMethod.calculateDistance(gpsPoint, startPoint);
-            if(distance > 300){
-                continue;
-            }
-            else{
-                List<RouteInfo> routeInfoList = transitRepository.findRouteInfoByRoute(route);
-                TransitPathDto transitPathDto = convertRouteInfoToDto(routeInfoList, route.getTime());
-                pathInfoList.add(transitPathDto);
-            }
-        }
-
-        return pathInfoList;
-    }
-
-    //1번
-    public List<TransitPathDto> getTransitRoute(String startStationId) {
-        List<TransitPathDto> pathInfoList = new ArrayList<>();
-
-        List<Route> routeList = transitRepository.findRouteByStartStationId(startStationId);
-
-        for (Route route : routeList) {
-                List<RouteInfo> routeInfoList = transitRepository.findRouteInfoByRoute(route);
-                TransitPathDto transitPathDto = convertRouteInfoToDto(routeInfoList, route.getTime());
-                pathInfoList.add(transitPathDto);
-        }
-
-
-        return pathInfoList;
-    }
-
-
-    public TransitPathDto convertRouteInfoToDto(List<RouteInfo> routeInfoList,int time){
-        boolean isFirst = true;
-        List<TransitSubPathDto> subPathDto = new ArrayList<>();
-        List<StationDto> stationList = new ArrayList<>();
-        List<DetailPositionDto> gpsDetail = new ArrayList<>();
-        TransitSubPathDto transitSubPathDto = null;
-        StationDto stationDto = null;
-        String lastLaneName = "";
-
-        for (int i = 0; i < routeInfoList.size(); i++) {
-            RouteInfo routeInfo = routeInfoList.get(i);
-            Edge edge = routeInfo.getEdge();
-            Station src = routeInfo.getEdge().getSrc();
-            String curLaneName = src.getBusName();
-
-            if(!lastLaneName.equals(curLaneName) & !isFirst){
-                transitSubPathDto.setStationList(stationList);
-                transitSubPathDto.setGpsDetail(gpsDetail);
-                transitSubPathDto.setTo(stationDto.getStationName());
-                subPathDto.add(transitSubPathDto);
-
-                stationList = new ArrayList<>();
-                gpsDetail = new ArrayList<>();
-
-                isFirst = true;
-            }
-            if(isFirst) {
-                lastLaneName = src.getBusName();
-                transitSubPathDto = TransitSubPathDto.builder()
-                        .type(src.getType())
-                        .from(src.getStationName())
-                        .laneName(lastLaneName)
-                        .build();
-                isFirst = false;
-            }
-
-            stationDto = StationDto.builder()
-                    .localStationId(src.getLocalStationId())
-                    .busName(src.getBusName())
-                    .stationName(src.getStationName())
-                    .gpsX(src.getX())
-                    .gpsY(src.getY())
-                    .build();
-
-            stationList.add(stationDto);
-            gpsDetail.addAll(edge.getDetailPositionList().stream().map(DetailPositionDto::new).collect(Collectors.toList()));
-        }
-
-        RouteInfo routeInfo = routeInfoList.get(routeInfoList.size() - 1);
-        Station dst = routeInfo.getEdge().getDst();
-        stationDto = StationDto.builder()
-                .localStationId(dst.getLocalStationId())
-                .stationName(dst.getStationName())
-                .busName(dst.getBusName())
-                .gpsX(dst.getX())
-                .gpsY(dst.getY())
-                .build();
-
-        stationList.add(stationDto);
-        transitSubPathDto.setStationList(stationList);
-        transitSubPathDto.setGpsDetail(gpsDetail);
-        transitSubPathDto.setTo(stationDto.getStationName());
-        subPathDto.add(transitSubPathDto);
-
-        return TransitPathDto.builder()
-                .subPathList(subPathDto)
-                .time(time)
-                .subPathCnt(subPathDto.size())
-                .build();
-    }
 
     public List<TransitPathDto> getTransitRoute(String startX, String startY, String numbers) {
         JSONObject transitJson = ApiUtilMethod.urlBuildWithJson(HOST_URL,
@@ -231,10 +130,6 @@ public class TransitRouteApi {
         JSONArray pathList = transitJson.getJSONObject("result").getJSONArray("path");
 
         for (Integer i : numbers) {
-//        for (int i = 0; i < 5; i++) {
-//            if(!numbers.contains(i)){
-//                continue;
-//            }
             JSONObject path = pathList.getJSONObject(i);
             JSONObject pathInfo = path.getJSONObject("info");
             int time = pathInfo.getInt("totalTime");
@@ -261,16 +156,20 @@ public class TransitRouteApi {
         for (int i = 0; i < subPathList.length(); i++) {
             JSONObject subPath = subPathList.getJSONObject(i);
 
+            String laneName = null;
+            String from = null;
+            String to = null;
+            List<StationDto> stationDtoList = null;
+
             int trafficType = subPath.getInt("trafficType");
             TransitType type = TransitType.of(trafficType);
             int sectionTime = subPath.getInt("sectionTime");
 
-            if(!type.equals(TransitType.WALK)){
-                String from = subPath.getString("startName");
-                String to = subPath.getString("endName");
+            if (!(type == TransitType.WALK && i == 0)){
+                from = subPath.getString("startName");
+                to = subPath.getString("endName");
 
                 JSONObject lane = subPath.getJSONArray("lane").getJSONObject(0);
-                String laneName;
                 if(type == TransitType.BUS){
                     laneName = lane.getString("busNo");
                 }
@@ -278,17 +177,18 @@ public class TransitRouteApi {
                     laneName = String.valueOf(lane.getInt("subwayCode"));
                 }
 
-                List<StationDto> stationDtoList = makeStationDtoList(subPath, laneName);
+                stationDtoList = makeStationDtoList(subPath, laneName);
 
-                transitSubPathDtoList.add(TransitSubPathDto.builder()
-                        .type(type)
-                        .laneName(laneName)
-                        .from(from)
-                        .to(to)
-                        .sectionTime(sectionTime)
-                        .stationList(stationDtoList)
-                        .build());
             }
+
+            transitSubPathDtoList.add(TransitSubPathDto.builder()
+                    .type(type)
+                    .laneName(laneName)
+                    .from(from)
+                    .to(to)
+                    .sectionTime(sectionTime)
+                    .stationList(stationDtoList)
+                    .build());
         }
         return transitSubPathDtoList;
     }
