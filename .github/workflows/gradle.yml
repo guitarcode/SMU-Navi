@@ -49,9 +49,9 @@ jobs:
       run: |
           cd ./src/main/resources
           touch ./application.properties
-          echo "${{ secrets.APP-YML }}" > ./application.yml
+          echo "${{ secrets.APP_YML }}" > ./application.yml
           touch ./application-API-KEY.yml
-          echo "${{ secrets.API-KEY-YML }}" > ./application-API-KEY.yml
+          echo "${{ secrets.API_KEY_YML }}" > ./application-API-KEY.yml
       shell: bash
       
         ## gradle build
