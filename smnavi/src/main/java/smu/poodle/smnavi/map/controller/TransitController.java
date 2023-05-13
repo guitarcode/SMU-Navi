@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import smu.poodle.smnavi.map.dto.RouteDto;
 import smu.poodle.smnavi.map.dto.TransitPathDto;
-import smu.poodle.smnavi.map.odsay.TransitRouteApi;
 import smu.poodle.smnavi.map.response.BaseResponse;
 import smu.poodle.smnavi.map.response.TransitResponse;
 import smu.poodle.smnavi.map.service.TransitService;
@@ -17,10 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransitController {
 
-    private final TransitRouteApi transitRouteApi;
     private final TransitService transitService;
-
-
 
     /**
      * startStationId 를 통해 경로를 불러오는 api

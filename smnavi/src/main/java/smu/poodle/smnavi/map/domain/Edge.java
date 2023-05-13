@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import smu.poodle.smnavi.map.externapi.TransitType;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class Edge {
 
     private boolean detailExist;
 
+    private Integer walkingTime;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "src_id")
     private Station src;
@@ -36,10 +38,6 @@ public class Edge {
 
     @OneToMany(mappedBy = "edge")
     private List<DetailPosition> detailPositionList;
-
-    public void setDst(Station dst) {
-        this.dst = dst;
-    }
 
     public void setDetailExistTrue(){
         this.detailExist = true;
