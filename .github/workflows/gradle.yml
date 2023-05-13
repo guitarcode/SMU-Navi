@@ -57,6 +57,7 @@ jobs:
     ## create application-prod.properties
     - name: make application.properties
       run: |
+          mkdir ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml
           echo "${{ secrets.APP_YML }}" > ./application.yml
