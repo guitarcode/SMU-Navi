@@ -57,11 +57,11 @@ jobs:
     ## create application-prod.properties
     - name: make application.properties
       run: |
-          mkdir ./src/main/resources
-          cd ./src/main/resources
+          mkdir ./smnavi/src/main/resources
+          cd ./smnavi/src/main/resources
           touch ./application.yml
           echo "${{ secrets.APP_YML }}" > ./application.yml
-          touch ./application-API-KEY.yml
+          touch ./smnavi/application-API-KEY.yml
           echo "${{ secrets.API_KEY_YML }}" > ./application-API-KEY.yml
       shell: bash
       
