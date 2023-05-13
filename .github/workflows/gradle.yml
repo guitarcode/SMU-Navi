@@ -61,13 +61,13 @@ jobs:
           cd ./smnavi/src/main/resources
           touch ./application.yml
           echo "${{ secrets.APP_YML }}" > ./application.yml
-          touch ./smnavi/application-API-KEY.yml
+          touch ./application-API-KEY.yml
           echo "${{ secrets.API_KEY_YML }}" > ./application-API-KEY.yml
       shell: bash
       
         ## gradle build
     - name: Build with Gradle
-      run: ./gradlew build -x test -x
+      run: ./gradlew build -x test
 
     ## docker build & push to production
     - name: Docker build & push
