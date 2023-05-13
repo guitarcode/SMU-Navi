@@ -75,6 +75,10 @@ jobs:
           docker build -t ${{ secrets.DOCKER_REPO }}/poodle-back .
           docker push ${{ secrets.DOCKER_REPO }}/poodle-back
           
+    - name: get GitHub IP 
+      id: ip
+      uses: haythem/public-ip@v1.3
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
