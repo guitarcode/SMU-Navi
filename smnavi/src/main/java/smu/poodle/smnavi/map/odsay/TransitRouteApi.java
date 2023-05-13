@@ -29,6 +29,7 @@ import static smu.poodle.smnavi.map.util.ConvertDtoUtil.convertRouteInfoToDto;
 @Transactional
 public class TransitRouteApi {
 
+
     private final TransitRepository transitRepository;
     private final RouteDetailPositionApi routeDetailPositionApi;
     private final ApiConstantValue apiConstantValue;
@@ -69,6 +70,20 @@ public class TransitRouteApi {
 
             for (TransitSubPathDto transitSubPathDto : transitSubPathDtoList) {
 
+                List<Edge> edgeList = new ArrayList<>();
+
+                if(transitSubPathDto.getType() == TransitType.WALK){
+                    Edge edge = Edge.builder()
+                            .src(null)
+                            .dst(null)
+                            .detailExist(false)
+                            .walkingTime(transitSubPathDto.getSectionTime())
+                            .build();
+
+                    edgeList.add(edge);
+                    edgeLists.add(edgeList);
+                    continue;
+                }
                 Station preStation = null;
 
                 List<StationDto> stationDtoList = transitSubPathDto.getStationList();
@@ -77,13 +92,13 @@ public class TransitRouteApi {
                         .collect(Collectors.toList());
                 stationList = transitRepository.saveStations(stationList);
 
-                List<Edge> edgeList = new ArrayList<>();
                 for (Station station : stationList) {
                     if (preStation != null) {
                         Edge edge = Edge.builder()
                                 .src(preStation)
                                 .dst(station)
                                 .detailExist(false)
+                                .walkingTime(transitSubPathDto.getSectionTime())
                                 .build();
                         edgeList.add(edge);
                     }
@@ -93,17 +108,23 @@ public class TransitRouteApi {
             }
 
             String[] mapObjArr = transitPathDto.getMapObj().split("@");
-            boolean b = true;
             List<Edge> entireEdgeList = new ArrayList<>();
+            int k = 0;
             for (int j = 0; j < edgeLists.size(); j++) {
                 List<Edge> edgeList = edgeLists.get(j);
+
+                if(edgeList.get(0).getDst() == null){
+                    System.out.println("p");
+                    continue;
+                }
                 List<Edge> persistedEdgeList = transitRepository.saveEdges(edgeList);
                 entireEdgeList.addAll(persistedEdgeList);
                 routeDetailPositionApi
                         .makeDetailPositionList(
                                 transitPathDto.getSubPathList().get(j),
-                                mapObjArr[j],
+                                mapObjArr[k],
                                 persistedEdgeList);
+                k++;
 
             }
             int size = entireEdgeList.size();
@@ -113,7 +134,6 @@ public class TransitRouteApi {
                 Route route = transitRepository.saveRoute(entireEdgeList.get(0).getSrc(), time);
                 transitRepository.saveRouteInfo(entireEdgeList, route, isMain);
                 entireEdgeList.remove(0);
-                time = time >= 3 ? time - 3 : 0;
                 isMain = false;
                 }
                 else {
@@ -165,7 +185,12 @@ public class TransitRouteApi {
             TransitType type = TransitType.of(trafficType);
             int sectionTime = subPath.getInt("sectionTime");
 
-            if (!(type == TransitType.WALK && i == 0)){
+            if(type == TransitType.WALK){
+                if(i == 0 || sectionTime == 0){
+                    continue;
+                }
+            }
+            else {
                 from = subPath.getString("startName");
                 to = subPath.getString("endName");
 
@@ -177,7 +202,7 @@ public class TransitRouteApi {
                     laneName = String.valueOf(lane.getInt("subwayCode"));
                 }
 
-                stationDtoList = makeStationDtoList(subPath, laneName);
+                stationDtoList = makeStationDtoList(subPath, laneName, type);
 
             }
 
@@ -194,20 +219,31 @@ public class TransitRouteApi {
     }
 
 
-    private List<StationDto> makeStationDtoList(JSONObject subPath, String laneName){
+    private List<StationDto> makeStationDtoList(JSONObject subPath, String laneName, TransitType type){
         List<StationDto> stationDtoList = new ArrayList<>();
 
         JSONArray stationList = subPath.getJSONObject("passStopList").getJSONArray("stations");
 
         for (int i = 0; i < stationList.length(); i++) {
             JSONObject station = stationList.getJSONObject(i);
-            String localStationId = station.getString("localStationID");
-            String stationName = station.getString("stationName");
+
+            String stationId;
+            String stationName;
+
             String x = station.getString("x");
             String y = station.getString("y");
+            stationName = station.getString("stationName");
+
+
+            if(type == TransitType.BUS) {
+                stationId = station.getString("localStationID");
+            }
+            else{
+                stationId = Integer.toString(station.getInt("stationID"));
+            }
 
             StationDto stationDto = StationDto.builder()
-                    .localStationId(localStationId)
+                    .localStationId(stationId)
                     .busName(laneName)
                     .stationName(stationName)
                     .gpsX(x)
