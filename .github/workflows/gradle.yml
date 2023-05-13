@@ -64,4 +64,19 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t ${{ secrets.DOCKER_REPO }}/poodle-back .
           docker push ${{ secrets.DOCKER_REPO }}/poodle-back
+          
+    ## deploy to production
+    - name: Deploy to prod
+      uses: appleboy/ssh-action@master
+      id: deploy
+      with:
+          host: ${{ secrets.HOST_PROD }}
+          username: ec2-user
+          key: ${{ secrets.PRIVATE_KEY }}
+          envs: GITHUB_SHA
+          script: |
+              sudo docker rm -f $(docker ps -qa)
+              sudo docker pull ${{ secrets.DOCKER_REPO }}/poodle-back
+              docker-compose up -d
+              docker image prune -f
 
