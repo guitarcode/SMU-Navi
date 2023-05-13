@@ -90,18 +90,18 @@ jobs:
       run: |
         aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
           
-    ## deploy to production
-    - name: Deploy to prod
-      uses: appleboy/ssh-action@master
-      id: deploy
-      with:
-          host: ${{ secrets.HOST_PROD }}
-          username: ec2-user
-          key: ${{ secrets.PRIVATE_KEY }}
-          envs: GITHUB_SHA
-          script: |
-              sudo docker rm -f $(docker ps -qa)
-              sudo docker pull ${{ secrets.DOCKER_REPO }}/poodle-back
-              docker-compose up -d
-              docker image prune -f
+#     ## deploy to production
+#     - name: Deploy to prod
+#       uses: appleboy/ssh-action@master
+#       id: deploy
+#       with:
+#           host: ${{ secrets.HOST_PROD }}
+#           username: ec2-user
+#           key: ${{ secrets.PRIVATE_KEY }}
+#           envs: GITHUB_SHA
+#           script: |
+#               sudo docker rm -f $(docker ps -qa)
+#               sudo docker pull ${{ secrets.DOCKER_REPO }}/poodle-back
+#               docker-compose up -d
+#               docker image prune -f
 
