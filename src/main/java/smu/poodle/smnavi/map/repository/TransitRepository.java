@@ -3,8 +3,9 @@ package smu.poodle.smnavi.map.repository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import smu.poodle.smnavi.map.externapi.GpsPoint;
 import smu.poodle.smnavi.map.domain.*;
+import smu.poodle.smnavi.map.domain.station.Waypoint;
+import smu.poodle.smnavi.map.externapi.GpsPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,32 +16,34 @@ public class TransitRepository {
 
     private final EntityManager em;
 
-    public List<StationInfo> findStationByLineNum(String lineName){
+    public List<StationInfo> findStationByLineNum(String lineName) {
         return em.createQuery("select s from StationInfo as s " +
-                "where s.lineName = :lineName", StationInfo.class)
+                        "where s.lineName = :lineName", StationInfo.class)
                 .setParameter("lineName", lineName)
                 .getResultList();
     }
 
-    public List<Station> findStationByLocalStationIdAndBusName(String localStationId, String busName){
+    public List<Waypoint> findStationByLocalStationIdAndBusName(String localStationId, String busName) {
         return em.createQuery("select s " +
-                "from Station s " +
-                "where s.localStationId = :stationId " +
-                "and s.busName = :busName", Station.class)
+                        "from Waypoint s " +
+                        "where s.stationId = :stationId " +
+                        "and s.busName = :busName", Waypoint.class)
                 .setParameter("stationId", localStationId)
                 .setParameter("busName", busName)
                 .getResultList();
     }
-    public List<Station> saveStations(List<Station> stationList){
-        List<Station> persistedStationList = new ArrayList<>();
-        for (Station station : stationList) {
-            List<Station> findedStation = findStationByLocalStationIdAndBusName(station.getLocalStationId(), station.getBusName());
-            if(findedStation.isEmpty()){
+
+    public List<Waypoint> saveStations(List<Waypoint> stationList) {
+        List<Waypoint> persistedStationList = new ArrayList<>();
+        for (Waypoint station : stationList) {
+            List<Waypoint> findStation = new ArrayList<>();
+            //todo: 이미 존재하는 Station 을 제외하는 알고리즘을 다시 작성해야 함
+//            List<Waypoint> findStation = findStationByLocalStationIdAndBusName(station.getStationId(), station.getBusName());
+            if (findStation.isEmpty()) {
                 em.persist(station);
                 persistedStationList.add(station);
-            }
-            else{
-                persistedStationList.add(findedStation.get(0));
+            } else {
+                persistedStationList.add(findStation.get(0));
             }
         }
         em.flush();
@@ -49,7 +52,7 @@ public class TransitRepository {
     }
 
     //쿼리
-    public List<Edge> saveEdges(List<Edge> edgeList){
+    public List<Edge> saveEdges(List<Edge> edgeList) {
         List<Edge> persistedEdgeList = new ArrayList<>();
         for (Edge edge : edgeList) {
             List<Edge> sameEdge = em.createQuery("select e from Edge as e " +
@@ -59,11 +62,10 @@ public class TransitRepository {
                     .setParameter("startStationId", edge.getSrc().getId())
                     .setParameter("endStationId", edge.getDst().getId())
                     .getResultList();
-            if(sameEdge.isEmpty()){
+            if (sameEdge.isEmpty()) {
                 em.persist(edge);
                 persistedEdgeList.add(edge);
-            }
-            else{
+            } else {
                 persistedEdgeList.add(sameEdge.get(0));
             }
         }
@@ -73,7 +75,15 @@ public class TransitRepository {
         return persistedEdgeList;
     }
 
-    public Route saveRoute(Station startStation, int time) {
+    public List<Edge> saveWalkingEdge(Edge edge) {
+        List<Edge> persistedEdgeList = new ArrayList<>();
+        em.persist(edge);
+        persistedEdgeList.add(edge);
+
+        return persistedEdgeList;
+    }
+
+    public Route saveRoute(Waypoint startStation, int time) {
         Route route = Route.builder()
                 .time(time)
                 .startStation(startStation)
@@ -85,7 +95,7 @@ public class TransitRepository {
         return route;
     }
 
-    public List<Route> findRouteByEdgeList(List<Edge> edgeList){
+    public List<Route> findRouteByEdgeList(List<Edge> edgeList) {
         List<Route> resultList = em.createQuery("select r.route " +
                         "from RouteInfo r " +
                         "inner join Edge as e on e = r.edge " +
@@ -101,14 +111,14 @@ public class TransitRepository {
                             "where r.route = :route", RouteInfo.class)
                     .setParameter("route", route)
                     .getResultList();
-            if(edgeList.size() == routeInfo.size()){
+            if (edgeList.size() == routeInfo.size()) {
                 return resultList;
             }
         }
         return new ArrayList<>();
     }
 
-    public void saveRouteInfo(List<Edge> edgeList, Route route, boolean isMain){
+    public void saveRouteInfo(List<Edge> edgeList, Route route, boolean isMain) {
         for (Edge edge : edgeList) {
 
             RouteInfo routeInfo = RouteInfo.builder()
@@ -122,15 +132,6 @@ public class TransitRepository {
         em.flush();
     }
 
-//    public void saveRouteInfo(List<RouteInfo> routeInfoList){
-//        for (RouteInfo routeInfo : routeInfoList) {
-//            em.persist(routeInfo);
-//        }
-//
-//        em.flush();
-//    }
-
-
 
     public void saveDetailPositions(List<DetailPosition> detailPositionList) {
         for (DetailPosition detailPosition : detailPositionList) {
@@ -139,31 +140,31 @@ public class TransitRepository {
         em.flush();
     }
 
-    public List<DetailPosition> findSimilarPoint(GpsPoint gpsPoint){
+    public List<DetailPosition> findSimilarPoint(GpsPoint gpsPoint) {
         return em.createQuery("select d from DetailPosition as d " +
                         "join fetch d.edge e " +
                         "join fetch e.src s " +
 //                        "join e.routeInfoList info " +
 //                        "join fetch info.route " +
-                "where d.x like :x and d.y like :y", DetailPosition.class)
-                .setParameter("x", "%"+gpsPoint.getGpsX()+"%")
-                .setParameter("y", "%"+gpsPoint.getGpsY()+"%")
+                        "where d.x like :x and d.y like :y", DetailPosition.class)
+                .setParameter("x", "%" + gpsPoint.getGpsX() + "%")
+                .setParameter("y", "%" + gpsPoint.getGpsY() + "%")
                 .getResultList();
     }
 
-    public List<DetailPosition> isContainDetailPos(Edge edge){
-            return em.createQuery("select d from DetailPosition d " +
-                                    "where d.edge = :edge", DetailPosition.class)
-                            .setParameter("edge", edge)
-                            .getResultList();
+    public List<DetailPosition> isContainDetailPos(Edge edge) {
+        return em.createQuery("select d from DetailPosition d " +
+                        "where d.edge = :edge", DetailPosition.class)
+                .setParameter("edge", edge)
+                .getResultList();
 
     }
 
     public List<Route> findAllRouteSeenTrue() {
         return em.createQuery("select r " +
-                "from Route as r " +
-                "join fetch r.startStation " +
-                "where r.isSeen = TRUE", Route.class)
+                        "from Route as r " +
+                        "join fetch r.startStation " +
+                        "where r.isSeen = TRUE", Route.class)
                 .getResultList();
     }
 
@@ -180,16 +181,15 @@ public class TransitRepository {
         return em.createQuery("select r " +
                         "from Route as r " +
                         "join fetch r.startStation " +
-                        "where r.startStation.localStationId = :id ", Route.class)
+                        "where r.startStation.stationId = :id ", Route.class)
                 .setParameter("id", startStationId)
                 .getResultList();
     }
+
     public List<RouteInfo> findRouteInfoByRoute(Route route) {
         return em.createQuery("select ri " +
                         "from RouteInfo as ri " +
                         "join fetch ri.edge as e " +
-                        "join fetch e.src " +
-                        "join fetch e.dst " +
                         "where ri.route = :route", RouteInfo.class)
                 .setParameter("route", route)
                 .getResultList();

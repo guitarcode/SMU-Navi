@@ -1,11 +1,9 @@
 package smu.poodle.smnavi.map.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import smu.poodle.smnavi.map.externapi.TransitType;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import smu.poodle.smnavi.map.domain.station.Waypoint;
 
 import java.util.List;
 
@@ -16,30 +14,36 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Table(name = "edges")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Edge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "edge_id")
-    private Integer id;
+    Integer id;
 
-    private boolean detailExist;
+    Boolean detailExist;
 
-    private Integer walkingTime;
+    Integer walkingTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "src_id")
-    private Station src;
+    Waypoint src;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dst_id")
-    private Station dst;
+    Waypoint dst;
 
     @OneToMany(mappedBy = "edge")
-    private List<RouteInfo> routeInfoList;
+    List<RouteInfo> routeInfoList;
 
-    @OneToMany(mappedBy = "edge")
-    private List<DetailPosition> detailPositionList;
+    @OneToMany(mappedBy = "edge", cascade = CascadeType.ALL)
+    List<DetailPosition> detailPositionList;
 
-    public void setDetailExistTrue(){
+    public void setDetailExistTrue() {
         this.detailExist = true;
+    }
+
+    public void setDetailPositionList(List<DetailPosition> detailPositionList) {
+        this.detailPositionList = detailPositionList;
     }
 }

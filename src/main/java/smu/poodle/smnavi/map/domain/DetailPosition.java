@@ -1,10 +1,8 @@
 package smu.poodle.smnavi.map.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Builder
@@ -12,15 +10,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Table(name = "detail_positions")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class DetailPosition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "detail_position_id")
-    private Integer id;
+    Long id;
 
-    @ManyToOne
-    private Edge edge;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Edge edge;
 
-    private String x;
-    private String y;
+    String x;
+    String y;
 }

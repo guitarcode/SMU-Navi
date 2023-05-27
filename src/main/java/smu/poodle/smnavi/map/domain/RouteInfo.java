@@ -1,27 +1,25 @@
 package smu.poodle.smnavi.map.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class RouteInfo {
-
-    //id 정렬만 해줘도 루트가 순서대로 올까?
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "route_info_id")
-    private Integer id;
+    Integer id;
 
-    private boolean isMain;
+    Boolean isMain;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Edge edge;
+    Edge edge;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Route route;
+    Route route;
 }

@@ -8,8 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import smu.poodle.smnavi.map.domain.DetailPosition;
 import smu.poodle.smnavi.map.domain.Edge;
 import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
-import smu.poodle.smnavi.map.dto.DetailPositionDto;
-import smu.poodle.smnavi.map.dto.TransitSubPathDto;
+import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.externapi.ApiConstantValue;
 import smu.poodle.smnavi.map.externapi.ApiKeyValue;
 import smu.poodle.smnavi.map.externapi.ApiUtilMethod;
@@ -28,7 +27,7 @@ public class RouteDetailPositionApi {
     private final String HOST_URL = "https://api.odsay.com/v1/api/loadLane";
     private final ApiConstantValue apiConstantValue;
 
-    public void makeDetailPositionList(TransitSubPathDto transitSubPathDto, String mapObj, List<Edge> edges){
+    public void makeDetailPositionList(PathDto.TransitSubPathDto transitSubPathDto, String mapObj, List<Edge> edges){
         boolean detailExist = true;
         for (Edge edge : edges) {
             detailExist = detailExist & edge.isDetailExist();
@@ -56,10 +55,10 @@ public class RouteDetailPositionApi {
             positionLists = makeSubwayDetailPositionList(graphPos, edges);
         }
 
-        List<DetailPositionDto> positionListForSubPath = new ArrayList<>();
+        List<PathDto.DetailPositionDto> positionListForSubPath = new ArrayList<>();
         for (List<DetailPosition> positionList : positionLists) {
             transitRepository.saveDetailPositions(positionList);
-            positionListForSubPath.addAll(positionList.stream().map(DetailPositionDto::new).collect(Collectors.toList()));
+            positionListForSubPath.addAll(positionList.stream().map(PathDto.DetailPositionDto::new).collect(Collectors.toList()));
         }
 
         transitSubPathDto.setGpsDetail(positionListForSubPath);

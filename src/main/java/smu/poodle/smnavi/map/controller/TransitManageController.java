@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import smu.poodle.smnavi.map.dto.TransitPathDto;
+import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.odsay.TransitRouteApi;
 import smu.poodle.smnavi.map.response.BaseResponse;
 import smu.poodle.smnavi.map.response.TransitResponse;
@@ -28,7 +28,7 @@ public class TransitManageController {
     public ResponseEntity<BaseResponse> saveTransit(@RequestParam String startX, @RequestParam String startY
             , @RequestParam String numbers){
 
-        List<TransitPathDto> transitRoute = transitRouteApi.getTransitRoute(startX, startY, numbers);
+        List<PathDto.Info> transitRoute = transitRouteApi.getTransitRoute(startX, startY, numbers);
 
         TransitResponse transitResponse = TransitResponse.builder()
                 .message("정상적으로 경로를 불러왔습니다.")

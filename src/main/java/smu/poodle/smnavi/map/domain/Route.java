@@ -1,10 +1,9 @@
 package smu.poodle.smnavi.map.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import smu.poodle.smnavi.map.domain.station.Waypoint;
 
 import java.util.List;
 
@@ -13,29 +12,31 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Route {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "route_id")
-    private Long id;
+    Long id;
 
-    private Integer time;
+    Integer time;
 
-    private String accidentInfo;
+    String accidentInfo;
 
-    private Boolean isSeen;
+    Boolean isSeen;
 
     @OneToMany(mappedBy = "route")
     List<RouteInfo> routeInfos;
 
     @ManyToOne
-    @JoinColumn(name = "startStationId")
-    private Station startStation;
+    @JoinColumn(name = "start_station_id")
+    Waypoint startStation;
 
-    public void updateAccident(String accidentInfo){
+    public void updateAccident(String accidentInfo) {
         this.accidentInfo = accidentInfo;
     }
 
-    public void updateIsSeen(){
+    public void updateIsSeen() {
         this.isSeen = !this.isSeen;
     }
 }

@@ -3,19 +3,21 @@ package smu.poodle.smnavi.map.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class StationInfo {
     @Id
-    private int stationId;
-
-    private String lineName;
-    private String stationName;
-    private int stationNum;
+    Integer stationId;
+    String lineName;
+    String stationName;
+    Integer stationNum;
     @Column(name = "gps_y")
-    private String gpsY;
+    String gpsY;
     @Column(name = "gps_X")
-    private String gpsX;
+    String gpsX;
 }

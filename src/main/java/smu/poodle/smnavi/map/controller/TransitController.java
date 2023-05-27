@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.dto.RouteDto;
-import smu.poodle.smnavi.map.dto.TransitPathDto;
 import smu.poodle.smnavi.map.response.BaseResponse;
 import smu.poodle.smnavi.map.response.TransitResponse;
 import smu.poodle.smnavi.map.service.TransitService;
@@ -20,13 +20,11 @@ public class TransitController {
 
     /**
      * startStationId 를 통해 경로를 불러오는 api
-     * @param startStationId
-     * @return
      */
     @GetMapping("/api/route/{startStationId}")
     public ResponseEntity<BaseResponse> getRoute(@PathVariable String startStationId){
 
-        List<TransitPathDto> transitRoute = transitService.getTransitRoute(startStationId);
+        List<PathDto.Info> transitRoute = transitService.getTransitRoute(startStationId);
 
         TransitResponse transitResponse = TransitResponse.builder()
                 .message("정상적으로 경로를 불러왔습니다.")
@@ -44,8 +42,8 @@ public class TransitController {
      */
 
     @GetMapping("/api/route")
-    public ResponseEntity<List<RouteDto>> getRouteList(){
-        List<RouteDto> routeList = transitService.getRouteList();
+    public ResponseEntity<List<RouteDto.Info>> getRouteList(){
+        List<RouteDto.Info> routeList = transitService.getRouteList();
 
         return new ResponseEntity<>(routeList, HttpStatus.OK);
     }

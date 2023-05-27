@@ -1,8 +1,10 @@
 package smu.poodle.smnavi.map.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -10,20 +12,21 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BusRouteInfo {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-    @ManyToOne
-    private Route route;
+    @ManyToOne(fetch = FetchType.LAZY)
+    Route route;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    LocalDateTime createdAt;
 
-    private boolean isFull;
-    private Integer congestion;
-
-    private Integer time;
+    Boolean isFull;
+    Integer congestion;
+    Integer time;
 
     public void setFull(boolean full) {
         isFull = full;
