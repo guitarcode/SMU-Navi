@@ -1,19 +1,21 @@
 package smu.poodle.smnavi.map.dto;
 
 import lombok.Data;
-import smu.poodle.smnavi.map.domain.Route;
+import smu.poodle.smnavi.map.domain.path.FullPath;
 
-@Data
 public class RouteDto {
-    private String startStationId;
-    private String startStationName;
-    private String x;
-    private String y;
+    @Data
+    public static class Info {
+        private String startStationId;
+        private String startStationName;
+        private String x;
+        private String y;
 
-    public RouteDto(Route route) {
-        this.startStationId = route.getStartStation().getLocalStationId();
-        this.startStationName = route.getStartStation().getStationName();
-        this.x = route.getStartStation().getX();
-        this.y = route.getStartStation().getY();
+        public Info(FullPath fullPath) {
+//            this.startStationId = route.getStartStation().getStationId();
+//            this.startStationName = route.getStartStation().getStationName();
+            this.x = fullPath.getStartWaypoint().getX();
+            this.y = fullPath.getStartWaypoint().getY();
+        }
     }
 }
