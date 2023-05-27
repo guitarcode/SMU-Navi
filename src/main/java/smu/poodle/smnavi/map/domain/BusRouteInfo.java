@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import smu.poodle.smnavi.map.domain.path.FullPath;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,7 @@ public class BusRouteInfo {
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    Route route;
+    FullPath fullPath;
 
     @CreationTimestamp
     LocalDateTime createdAt;
@@ -36,8 +37,8 @@ public class BusRouteInfo {
         this.congestion = congestion;
     }
 
-    public void setRoute(Route route) {
-        this.route = route;
+    public void setFullPath(FullPath fullPath) {
+        this.fullPath = fullPath;
     }
 
     public void setTime(Integer time) {

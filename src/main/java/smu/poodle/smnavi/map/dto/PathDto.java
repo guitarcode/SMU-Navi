@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import smu.poodle.smnavi.map.domain.DetailPosition;
-import smu.poodle.smnavi.map.domain.Route;
-import smu.poodle.smnavi.map.domain.RouteInfo;
-import smu.poodle.smnavi.map.domain.station.BusStation;
-import smu.poodle.smnavi.map.domain.station.BusType;
-import smu.poodle.smnavi.map.domain.station.SubwayStation;
-import smu.poodle.smnavi.map.domain.station.Waypoint;
-import smu.poodle.smnavi.map.externapi.TransitType;
+import smu.poodle.smnavi.map.domain.mapping.FullPathAndSubPath;
+import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
+import smu.poodle.smnavi.map.domain.path.DetailPosition;
+import smu.poodle.smnavi.map.domain.path.Edge;
+import smu.poodle.smnavi.map.domain.path.FullPath;
+import smu.poodle.smnavi.map.domain.path.SubPath;
+import smu.poodle.smnavi.map.domain.data.TransitType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,104 +25,92 @@ public class PathDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Info {
-        List<TransitSubPathDto> subPathList;
         int time;
-
         int subPathCnt;
-
+        List<SubPathDto> subPathList;
         @JsonIgnore
         String mapObj;
 
-        public Info(List<TransitSubPathDto> transitInfoList, int time) {
-            this.subPathList = transitInfoList;
-            this.time = time;
+        public static Info fromEntity(FullPath fullPath){
+            List<SubPath> subPaths = fullPath.getSubPaths().stream()
+                    .map(FullPathAndSubPath::getSubPath).toList();
+
+            List<PathDto.SubPathDto> subPathDtos = new ArrayList<>();
+
+            for (SubPath subPath : subPaths) {
+                //엣지를 경유 WaypointDto 로 변환하는 작업
+                //dto 에 팩토리메서드패턴을 구현하여 edge 의 정보를 waypoint 와 detailPosition 으로 변환하고
+                //변환된 정보를 subPathDto 로 담아 생성함
+                List<Edge> edges = subPath.getEdgeInfos().stream().map(SubPathAndEdge::getEdge).toList();
+
+                subPathDtos.add(PathDto.SubPathDto.makeSubPathDtoWithEdges(subPath, edges));
+            }
+
+            return Info.builder()
+                    .subPathList(subPathDtos)
+                    .time(fullPath.getTotalTime())
+                    .subPathCnt(subPaths.size())
+                    .build();
         }
     }
 
     @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Builder
     @Setter
-    public static class TransitSubPathDto {
-        TransitType type;
-        String laneName;
+    public static class SubPathDto {
+        TransitType transitType;
         String from;
         String to;
-        int sectionTime;
+        Integer sectionTime;
         List<WaypointDto> stationList;
         List<DetailPositionDto> gpsDetail;
 
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static class WaypointDto {
-        private String gpsX;
-        private String gpsY;
-
-        public Waypoint toEntity() {
-            return Waypoint.builder()
-                    .x(this.gpsX)
-                    .y(this.gpsY)
-                    .build();
-        }
-    }
-
-    @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static class BusStationDto extends WaypointDto {
-        final String localStationId;
-        final String busName;
-        final String stationName;
-        final int busType;
-
-        @Override
-        public BusStation toEntity() {
-            return BusStation.builder()
-                    .x(super.getGpsX())
-                    .y(super.getGpsY())
-                    .localStationId(this.localStationId)
-                    .busName(this.busName)
-                    .stationName(this.stationName)
-                    .busType(BusType.fromTypeNumber(busType))
+        public static SubPathDto makeSubPathDtoWithEdges(SubPath subPath, List<Edge> edges){
+            return SubPathDto.builder()
+                    .transitType(subPath.getTransitType())
+                    .sectionTime(subPath.getSectionTime())
+                    .stationList(WaypointDto.edgesToWaypointDtos(edges))
+                    .from(subPath.getToName())
+                    .to(subPath.getToName())
+                    .gpsDetail(DetailPositionDto.edgesToDetailPositionDtos(edges))
+                    .from(subPath.getFromName())
+                    .to(subPath.getToName())
                     .build();
         }
 
-        @Builder
-        public BusStationDto(String gpsX, String gpsY, String localStationId, String busName, String stationName, int busType) {
-            super(gpsX, gpsY);
-            this.localStationId = localStationId;
-            this.busName = busName;
-            this.stationName = stationName;
-            this.busType = busType;
-        }
     }
 
-    @FieldDefaults(level = AccessLevel.PRIVATE)
-    public static class SubwayStationDto extends WaypointDto {
-        final Integer stationId; //역 아이디
-        final String lineName; //호선 이름
-        final String stationName;
 
-        @Override
-        public SubwayStation toEntity() {
-            return SubwayStation.builder()
-                    .x(super.getGpsX())
-                    .y(super.getGpsY())
-                    .stationId(this.stationId)
-                    .lineName(this.lineName)
-                    .stationName(this.stationName)
-                    .build();
-        }
 
-        @Builder
-        public SubwayStationDto(String gpsX, String gpsY, Integer stationId, String lineName, String stationName) {
-            super(gpsX, gpsY);
-            this.stationId = stationId;
-            this.lineName = lineName;
-            this.stationName = stationName;
-        }
-    }
+//    @EqualsAndHashCode(callSuper = true)
+//    @FieldDefaults(level = AccessLevel.PRIVATE)
+//    @Data
+//    @SuperBuilder
+//    public static class SubwayStationDto extends WaypointDto {
+//        final Integer stationId; //역 아이디
+//        final String lineName; //호선 이름
+//        final String stationName;
+//
+//        @Override
+//        public SubwayStation toEntity() {
+//            return SubwayStation.builder()
+//                    .x(super.getGpsX())
+//                    .y(super.getGpsY())
+//                    .stationId(this.stationId)
+//                    .lineName(this.lineName)
+//                    .stationName(this.stationName)
+//                    .build();
+//        }
+//
+////        public SubwayStationDto(String gpsX, String gpsY, Integer stationId, String lineName, String stationName) {
+////            super(gpsX, gpsY);
+////            this.stationId = stationId;
+////            this.lineName = lineName;
+////            this.stationName = stationName;
+////        }
+//    }
 
     @Data
     @AllArgsConstructor
@@ -133,6 +121,17 @@ public class PathDto {
         public DetailPositionDto(DetailPosition detailPosition) {
             this.gpsX = detailPosition.getX();
             this.gpsY = detailPosition.getY();
+        }
+
+        public static List<DetailPositionDto> edgesToDetailPositionDtos(List<Edge> edges) {
+            List<DetailPositionDto> detailPositionDtos = new ArrayList<>();
+
+            for (Edge edge : edges) {
+                detailPositionDtos.addAll(edge.getDetailPositionList()
+                        .stream().map(PathDto.DetailPositionDto::new).toList());
+            }
+
+            return detailPositionDtos;
         }
     }
 

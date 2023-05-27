@@ -10,10 +10,10 @@
 //import org.w3c.dom.Node;
 //import org.w3c.dom.NodeList;
 //import org.xml.sax.SAXException;
-//import smu.poodle.smnavi.map.domain.DetailPosition;
-//import smu.poodle.smnavi.map.domain.Edge;
+//import smu.poodle.smnavi.map.domain.path.DetailPosition;
+//import smu.poodle.smnavi.map.domain.path.Edge;
 //import smu.poodle.smnavi.map.domain.Route;
-//import smu.poodle.smnavi.map.domain.RouteInfo;
+//import smu.poodle.smnavi.map.domain.path.RouteInfo;
 //import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
 //import smu.poodle.smnavi.map.externapi.ApiKeyValue;
 //import smu.poodle.smnavi.map.externapi.ApiUtilMethod;

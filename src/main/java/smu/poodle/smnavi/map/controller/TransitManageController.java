@@ -12,7 +12,7 @@ import smu.poodle.smnavi.map.dto.PathDto;
 import smu.poodle.smnavi.map.odsay.TransitRouteApi;
 import smu.poodle.smnavi.map.response.BaseResponse;
 import smu.poodle.smnavi.map.response.TransitResponse;
-import smu.poodle.smnavi.map.service.TransitService;
+import smu.poodle.smnavi.map.service.PathService;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
 public class TransitManageController {
     private final TransitRouteApi transitRouteApi;
 
-    private final TransitService transitService;
+    private final PathService pathService;
 
     //odsay api 호출해서 api 만드는 요청
     @PostMapping("/api/map/transit")
@@ -40,7 +40,7 @@ public class TransitManageController {
 
     @PostMapping("/api/route/seen/{id}")
     public ResponseEntity<HttpStatus> getRouteList(@PathVariable Long id){
-        transitService.updateRouteSeen(id);
+        pathService.updateRouteSeen(id);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
