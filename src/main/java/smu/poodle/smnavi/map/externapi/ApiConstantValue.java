@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
+//todo: 이렇게 사용하지 말자..
 @Getter
 @Component
 public class ApiConstantValue {
