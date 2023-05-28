@@ -29,6 +29,10 @@ public class BusStation extends Waypoint {
     public String getPointName() {
         return this.stationName;
     }
+    @Override
+    public String getStartStationId() {
+        return localStationId;
+    }
 
     @Override
     public WaypointDto toDto(){

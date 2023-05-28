@@ -25,6 +25,12 @@ public class SubwayStation extends Waypoint {
     }
 
     @Override
+    public String getStartStationId() {
+        return this.stationId.toString();
+    }
+
+
+    @Override
     public WaypointDto toDto(){
         return SubwayStationDto.builder()
                 .gpsX(super.getX())

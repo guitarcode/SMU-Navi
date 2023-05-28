@@ -59,6 +59,7 @@ public class PathDto {
     @NoArgsConstructor
     @Builder
     @Setter
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class SubPathDto {
         TransitType transitType;
         String from;

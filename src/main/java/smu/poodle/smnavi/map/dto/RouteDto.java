@@ -12,8 +12,8 @@ public class RouteDto {
         private String y;
 
         public Info(FullPath fullPath) {
-//            this.startStationId = route.getStartStation().getStationId();
-//            this.startStationName = route.getStartStation().getStationName();
+            this.startStationId = fullPath.getStartWaypoint().getStartStationId();
+            this.startStationName = fullPath.getStartWaypoint().getPointName();
             this.x = fullPath.getStartWaypoint().getX();
             this.y = fullPath.getStartWaypoint().getY();
         }
