@@ -3,6 +3,7 @@ package smu.poodle.smnavi.map.service.manage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import smu.poodle.smnavi.map.domain.data.BusType;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.path.Edge;
 import smu.poodle.smnavi.map.domain.path.FullPath;
@@ -57,9 +58,7 @@ public class PathManageService {
             List<Edge> persistedEdges = new ArrayList<>();
 
             // 버스나 지하철인 경우 정류장 및 엣지 정보를 우선 저장
-            for (int j = 0; j < edges.size(); j++) {
-                Edge edge = edges.get(j);
-
+            for (Edge edge : edges) {
                 Optional<Edge> persistedEdge = edgeRepository.findFirstBySrcIdAndDstId(edge.getSrc().getId(), edge.getDst().getId());
 
                 if (persistedEdge.isPresent()) {
@@ -86,6 +85,8 @@ public class PathManageService {
                     .toName(subPathDto.getTo())
                     .src(waypoints.get(0))
                     .dst(waypoints.get(waypoints.size() - 1))
+                    .busType(BusType.fromTypeNumber(subPathDto.getBusTypeInt()))
+                    .lineName(subPathDto.getLineName())
                     .build();
 
             subPathService.saveWithEdgeMapping(subPath, persistedEdges);

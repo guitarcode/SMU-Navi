@@ -3,6 +3,7 @@ package smu.poodle.smnavi.map.domain.path;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import smu.poodle.smnavi.map.domain.data.BusType;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
@@ -37,6 +38,11 @@ public class SubPath {
     String fromName;
 
     String toName;
+
+    @Enumerated(EnumType.STRING)
+    BusType busType;
+
+    String lineName; //버스 번호 혹은 지하철 호선 이름
 
     @OneToMany(mappedBy = "subPath")
     List<SubPathAndEdge> edgeInfos;

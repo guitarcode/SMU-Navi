@@ -16,8 +16,7 @@ import smu.poodle.smnavi.map.dto.WaypointDto;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubwayStation extends Waypoint {
     Integer stationId; //역 아이디
-    String lineName; //역 번호
-    String stationName;
+    String stationName; //역 이름
 
     @Override
     public String getPointName() {
@@ -36,7 +35,6 @@ public class SubwayStation extends Waypoint {
                 .gpsX(super.getX())
                 .gpsY(super.getY())
                 .stationId(stationId)
-                .lineName(lineName)
                 //todo: 버스타입을 무슨 값으로 돌릴지 상의 필요
                 .stationName(stationName)
                 .build();

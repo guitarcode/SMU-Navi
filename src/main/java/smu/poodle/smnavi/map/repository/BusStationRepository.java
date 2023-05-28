@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BusStationRepository extends JpaRepository<BusStation, Long> {
-    Optional<BusStation> findFirstByLocalStationIdAndBusName(String localStationId, String busName);
+    Optional<BusStation> findFirstByLocalStationId(String localStationId);
 
     List<Waypoint> findAllByLocalStationId(String localStationId);
 

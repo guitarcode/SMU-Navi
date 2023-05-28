@@ -93,6 +93,7 @@ public class TransitRouteApi {
             int trafficType = subPathJson.getInt("trafficType");
             TransitType type = TransitType.of(trafficType);
             int sectionTime = subPathJson.getInt("sectionTime");
+            int busTypeInt = 0;
 
             if (type == TransitType.WALK) {
                 if (i == 0) {
@@ -104,7 +105,6 @@ public class TransitRouteApi {
 
                 JSONObject lane = subPathJson.getJSONArray("lane").getJSONObject(0);
 
-                int busTypeInt = 0;
                 //todo: switch-case 문으로 바꾸자
                 if (type == TransitType.BUS) {
                     laneName = lane.getString("busNo");
@@ -112,7 +112,7 @@ public class TransitRouteApi {
                 } else if (type == TransitType.SUBWAY) {
                     laneName = String.valueOf(lane.getInt("subwayCode"));
                 }
-                waypointDtoList = makeStationDtoList(subPathJson, laneName, type, busTypeInt);
+                waypointDtoList = makeStationDtoList(subPathJson, type);
 
             }
 
@@ -121,14 +121,17 @@ public class TransitRouteApi {
                     .sectionTime(sectionTime)
                     .from(from)
                     .to(to)
+                    .busTypeInt(busTypeInt)
+                    .lineName(laneName)
                     .stationList(waypointDtoList)
                     .build());
+
         }
         return subPathDtoList;
     }
 
 
-    private List<WaypointDto> makeStationDtoList(JSONObject subPath, String laneName, TransitType type, int busTypeInt) {
+    private List<WaypointDto> makeStationDtoList(JSONObject subPath, TransitType type) {
         List<WaypointDto> waypointDtoList = new ArrayList<>();
 
         JSONArray stationList = subPath.getJSONObject("passStopList").getJSONArray("stations");
@@ -148,9 +151,7 @@ public class TransitRouteApi {
 
                 waypointDtoList.add(BusStationDto.builder()
                         .localStationId(stationId)
-                        .busName(laneName)
                         .stationName(stationName)
-                        .busType(busTypeInt)
                         .gpsX(x)
                         .gpsY(y)
                         .build());
@@ -160,7 +161,6 @@ public class TransitRouteApi {
 
                 waypointDtoList.add(SubwayStationDto.builder()
                         .stationId(stationId)
-                        .lineName(laneName)
                         .stationName(stationName)
                         .gpsX(x)
                         .gpsY(y)

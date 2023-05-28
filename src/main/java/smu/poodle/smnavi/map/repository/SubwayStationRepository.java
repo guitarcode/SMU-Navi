@@ -11,8 +11,7 @@ import java.util.Optional;
 
 public interface SubwayStationRepository extends JpaRepository<SubwayStation, Long> {
 
-    Optional<SubwayStation> findFirstByLineNameAndStationId(String lineName, Integer stationId);
+    Optional<SubwayStation> findFirstByStationId(Integer stationId);
 
-//    @EntityGraph(attributePaths = {"fullPat/**/hs", "fullPaths.subPaths", "fullPaths.subPaths.subPath"})
     List<Waypoint> findAllByStationId(Integer stationId);
 }

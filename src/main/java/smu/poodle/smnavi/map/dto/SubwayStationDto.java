@@ -12,7 +12,6 @@ import smu.poodle.smnavi.map.domain.station.SubwayStation;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubwayStationDto extends WaypointDto {
     Integer stationId; //역 아이디
-    String lineName; //호선 이름
     String stationName;
     @Override
     public SubwayStation toEntity() {
@@ -20,7 +19,6 @@ public class SubwayStationDto extends WaypointDto {
                 .x(super.getGpsX())
                 .y(super.getGpsY())
                 .stationId(this.stationId)
-                .lineName(this.lineName)
                 .stationName(this.stationName)
                 .build();
     }
