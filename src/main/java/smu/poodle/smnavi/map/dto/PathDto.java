@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import smu.poodle.smnavi.map.domain.data.BusType;
 import smu.poodle.smnavi.map.domain.mapping.FullPathAndSubPath;
 import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
 import smu.poodle.smnavi.map.domain.path.DetailPosition;
@@ -59,13 +60,22 @@ public class PathDto {
     @NoArgsConstructor
     @Builder
     @Setter
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static class SubPathDto {
         TransitType transitType;
+
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
+        String busType;
+        @JsonIgnore
+        Integer busTypeInt;
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
+        String lineName;
         String from;
         String to;
         Integer sectionTime;
+
+
         List<WaypointDto> stationList;
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<DetailPositionDto> gpsDetail;
 
         public static SubPathDto makeSubPathDtoWithEdges(SubPath subPath, List<Edge> edges){

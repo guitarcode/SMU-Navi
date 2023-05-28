@@ -21,10 +21,9 @@ public class WaypointService {
     public Waypoint save(Waypoint waypoint) {
         Optional<? extends Waypoint> optionalWaypoint = findWaypoint(waypoint);
 
-        if(optionalWaypoint.isPresent()){
+        if (optionalWaypoint.isPresent()) {
             return optionalWaypoint.get();
-        }
-        else{
+        } else {
             return wayPointRepository.save(waypoint);
         }
     }
@@ -45,15 +44,13 @@ public class WaypointService {
     }
 
     private Optional<? extends Waypoint> findBusStation(BusStation busStation) {
-        return busStationRepository.findFirstByLocalStationIdAndBusName(
-                busStation.getLocalStationId(),
-                busStation.getBusName());
+        return busStationRepository.findFirstByLocalStationId(
+                busStation.getLocalStationId());
     }
 
     private Optional<? extends Waypoint> findSubwayStation(SubwayStation subwayStation) {
-        return subwayStationRepository.findFirstByLineNameAndStationId(
-                        subwayStation.getLineName(),
-                        subwayStation.getStationId());
+        return subwayStationRepository.findFirstByStationId(
+                subwayStation.getStationId());
     }
 
 }

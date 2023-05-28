@@ -19,11 +19,7 @@ import smu.poodle.smnavi.map.dto.WaypointDto;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BusStation extends Waypoint {
     String localStationId; //버스는 LocalStationId, 지하철은 StationId
-    String busName;
     String stationName;
-
-    @Enumerated(EnumType.STRING)
-    BusType busType;
 
     @Override
     public String getPointName() {
@@ -40,10 +36,7 @@ public class BusStation extends Waypoint {
                 .gpsX(super.getX())
                 .gpsY(super.getY())
                 .localStationId(localStationId)
-                .busName(busName)
                 .stationName(stationName)
-                //todo: 버스타입을 무슨 값으로 돌릴지 상의 필요
-                .busType(busType.getTypeNumber())
                 .build();
     }
 }

@@ -13,9 +13,7 @@ import smu.poodle.smnavi.map.domain.station.BusStation;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BusStationDto extends WaypointDto {
     String localStationId;
-    String busName;
     String stationName;
-    int busType;
 
     @Override
     public BusStation toEntity() {
@@ -23,9 +21,7 @@ public class BusStationDto extends WaypointDto {
                 .x(super.getGpsX())
                 .y(super.getGpsY())
                 .localStationId(this.localStationId)
-                .busName(this.busName)
                 .stationName(this.stationName)
-                .busType(BusType.fromTypeNumber(busType))
                 .build();
     }
 
