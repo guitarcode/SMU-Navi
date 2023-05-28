@@ -31,15 +31,20 @@ public class Waypoint {
     @OneToMany(mappedBy = "startWaypoint")
     List<FullPath> fullPaths;
 
-    public String getPointName(){
+    public String getPointName() {
         return null;
     }
+
+    public String getStartStationId() {
+        return null;
+    }
+
     public Waypoint(String x, String y) {
         this.x = x;
         this.y = y;
     }
 
-    public WaypointDto toDto(){
+    public WaypointDto toDto() {
         return WaypointDto.builder()
                 .gpsX(x)
                 .gpsY(y)
