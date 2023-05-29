@@ -96,7 +96,7 @@ public class TransitRouteApi {
             int busTypeInt = 0;
 
             if (type == TransitType.WALK) {
-                if (i == 0) {
+                if (i == 0 || sectionTime == 0) {
                     continue;
                 }
             } else {
