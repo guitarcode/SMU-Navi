@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import smu.poodle.smnavi.map.domain.data.BusType;
+import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.mapping.FullPathAndSubPath;
 import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
 import smu.poodle.smnavi.map.domain.path.DetailPosition;
 import smu.poodle.smnavi.map.domain.path.Edge;
 import smu.poodle.smnavi.map.domain.path.FullPath;
 import smu.poodle.smnavi.map.domain.path.SubPath;
-import smu.poodle.smnavi.map.domain.data.TransitType;
 
 import java.util.ArrayList;
 import java.util.List;
