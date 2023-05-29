@@ -52,7 +52,9 @@ public class PathService {
     public List<RouteDto.Info> getRouteList() {
         List<FullPath> fullPathList = transitRepository.findAllRouteSeenTrue();
 
-        return fullPathList.stream().map(RouteDto.Info::new).collect(Collectors.toList());
+        //todo: fullpath가 가지고 있는 startstation의 목록을 반환해주는 쿼리를 작성해보기
+        List<Waypoint> waypoints = fullPathList.stream().map(FullPath::getStartWaypoint).distinct().toList();
+        return waypoints.stream().map(RouteDto.Info::new).collect(Collectors.toList());
     }
 
     public void updateRouteSeen(Long id) {

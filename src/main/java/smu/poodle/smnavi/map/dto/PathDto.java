@@ -39,9 +39,15 @@ public class PathDto {
             List<PathDto.SubPathDto> subPathDtos = new ArrayList<>();
 
             for (SubPath subPath : subPaths) {
+                // 요구사항에 의해 walk 시간이 0이면 반환하지 않도록 처리
+                // 만약 요구사항이 변경되어도 DB 에는 저장되기 때문에 DTO 변환만 건들면 됨
+                if(subPath.getTransitType() == TransitType.WALK && subPath.getSectionTime() == 0){
+                    continue;
+                }
                 //엣지를 경유 WaypointDto 로 변환하는 작업
                 //dto 에 팩토리메서드패턴을 구현하여 edge 의 정보를 waypoint 와 detailPosition 으로 변환하고
                 //변환된 정보를 subPathDto 로 담아 생성함
+
                 List<Edge> edges = subPath.getEdgeInfos().stream().map(SubPathAndEdge::getEdge).toList();
 
                 subPathDtos.add(PathDto.SubPathDto.makeSubPathDtoWithEdges(subPath, edges));
@@ -72,8 +78,6 @@ public class PathDto {
         String from;
         String to;
         Integer sectionTime;
-
-
         List<WaypointDto> stationList;
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<DetailPositionDto> gpsDetail;
