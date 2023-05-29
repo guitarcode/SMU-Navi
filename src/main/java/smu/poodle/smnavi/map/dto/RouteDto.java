@@ -1,7 +1,6 @@
 package smu.poodle.smnavi.map.dto;
 
 import lombok.Data;
-import smu.poodle.smnavi.map.domain.path.FullPath;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 
 public class RouteDto {
