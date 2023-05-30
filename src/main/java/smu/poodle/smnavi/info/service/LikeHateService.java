@@ -6,6 +6,7 @@ import smu.poodle.smnavi.info.domain.InfoEntity;
 import smu.poodle.smnavi.info.domain.LikeHateEntity;
 import smu.poodle.smnavi.info.repository.InfoRepository;
 import smu.poodle.smnavi.info.repository.LikeHateRepository;
+import smu.poodle.smnavi.user.auth.Kind;
 import smu.poodle.smnavi.user.domain.UserEntity;
 
 import java.util.HashMap;
@@ -53,6 +54,15 @@ public class LikeHateService {
         Optional<LikeHateEntity> likeOrHate = likeHateRepository.findByUserAndBoard_Id(user, boardId); //눌렀는지 아닌지 여부
         result.put("like",like);
         result.put("hate",hate);
+//        if(like>=3){
+//            Optional<InfoEntity>infoEntity = infoRepository.findById(boardId);
+//            if(infoEntity.isPresent()){
+//                Kind kind = infoEntity.get().getKind();
+//                infoEntity.get().setKind(kind);
+//                infoRepository.save(infoEntity.get());
+//
+//            }
+//        }
         if(likeOrHate.isPresent()){
             result.put("emotion",likeOrHate.get().getIdentify());
         }else{

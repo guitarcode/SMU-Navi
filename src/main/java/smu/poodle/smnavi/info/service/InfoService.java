@@ -7,7 +7,11 @@ import smu.poodle.smnavi.exceptiony.DuplicateNoticeException;
 import smu.poodle.smnavi.exceptiony.InfoNotFoundException;
 import smu.poodle.smnavi.info.domain.InfoEntity;
 import smu.poodle.smnavi.info.dto.InfoDto;
+import smu.poodle.smnavi.info.dto.LocationDto;
 import smu.poodle.smnavi.info.repository.InfoRepository;
+import smu.poodle.smnavi.map.domain.data.TransitType;
+import smu.poodle.smnavi.user.auth.Kind;
+import smu.poodle.smnavi.info.domain.Location;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,10 +23,11 @@ public class InfoService {
     @Autowired
     private InfoRepository infoRepository;
 
-    public InfoService(InfoRepository infoRepository){
+    public InfoService(InfoRepository infoRepository) {
         this.infoRepository = infoRepository;
     }
-    public void addInfo(InfoDto infoDto){
+
+    public void addInfo(InfoDto infoDto) {
         LocalDateTime checkDate = LocalDateTime.now().minusMinutes(1); //1분 전의 시간
         int noticeCount = infoRepository.countByTitleAndContentAndRegDateIsGreaterThanEqual(
                 infoDto.getTitle(),
@@ -32,17 +37,25 @@ public class InfoService {
         if (noticeCount > 0) {
             throw new DuplicateNoticeException("1분 이내에 동일한 내용의 제보 글이 등록되었습니다."); //제목이나 내용이 달라야함. id만 다르면 안됨
         }
-        infoRepository.save(infoDto.ToEntity());
+        Kind kind = infoDto.getKind(); // 선택한 Kind 값 가져오기
+        InfoEntity infoEntity = infoDto.ToEntity();
+        infoEntity.setKind(kind); // 선택한 Kind 값을 저장
+        Location location = infoDto.getLocation();
+        InfoEntity infoEntity1 = infoDto.ToEntity();
+        infoEntity1.setLocation(location);
+
+        infoRepository.save(infoEntity);
     }
-    public List<InfoDto> listAllinfo(String keyword){
+
+    public List<InfoDto> listAllinfo(String keyword) {
         List<InfoEntity> all = null;
-        if(keyword==null||keyword.isEmpty()){
+        if (keyword == null || keyword.isEmpty()) {
             all = infoRepository.findAll();
-        }else{
+        } else {
             all = infoRepository.findByTitleContainingOrContentContaining(keyword, keyword);
         }
-        List<InfoDto>DtoList = new ArrayList<>();
-        for(InfoEntity infoEntity : all){
+        List<InfoDto> DtoList = new ArrayList<>();
+        for (InfoEntity infoEntity : all) {
 
             InfoDto infoDto = InfoDto.builder()
                     .id(infoEntity.getId())
@@ -55,48 +68,59 @@ public class InfoService {
         }
         return DtoList;
     }
-    public Optional<InfoEntity> updateInfo(Long id, InfoDto infoDto){
+
+    public Optional<InfoEntity> updateInfo(Long id, InfoDto infoDto) {
         LocalDateTime updateTime = LocalDateTime.now().minusMinutes(1);
         int infoCount = infoRepository.countByTitleAndContentAndRegDateIsGreaterThanEqual(
                 infoDto.getTitle(),
                 infoDto.getContent(),
                 updateTime
         );
-        if(infoCount>0){
+        if (infoCount > 0) {
             throw new DuplicateInfoException("수정된 내용이 없습니다.");
         }
         InfoEntity infoEntity = infoRepository.findById(id)
-                .orElseThrow(()->new InfoNotFoundException("해당 제보 글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new InfoNotFoundException("해당 제보 글을 찾을 수 없습니다."));
         infoEntity.setTitle(infoDto.getTitle());
         infoEntity.setContent(infoDto.getContent());
         infoRepository.save(infoEntity);
         return Optional.of(infoEntity);
     }
-    public void increaseViews(Long id){
-        InfoEntity infoEntity = infoRepository.findById(id).orElseThrow(()->new InfoNotFoundException("해당 제보 글을 찾을 수 없습니다."));
+
+    public void increaseViews(Long id) {
+        InfoEntity infoEntity = infoRepository.findById(id).orElseThrow(() -> new InfoNotFoundException("해당 제보 글을 찾을 수 없습니다."));
         infoEntity.increaseViews();
         infoRepository.save(infoEntity);
     }
-    public Optional<InfoDto>getInfoById(Long id){
-    Optional<InfoEntity> infoEntity = infoRepository.findById(id);
-    Optional<InfoDto> infoDto = Optional.ofNullable(InfoDto.builder()
-            .id(infoEntity.get().getId())
-            .title(infoEntity.get().getTitle())
-            .content(infoEntity.get().getContent())
-            .regDate(infoEntity.get().getRegDate())
-            .updateDate(infoEntity.get().getUpdateDate())
-            .increaseCount(infoEntity.get().getIncreaseCount())
-            .build());
-    return infoDto;
-    }
-    public Long deleteInfoId(Long id){
+
+    public Optional<InfoDto> getInfoById(Long id) {
         Optional<InfoEntity> infoEntity = infoRepository.findById(id);
-        if(!infoEntity.isPresent()){
+        Optional<InfoDto> infoDto = Optional.ofNullable(InfoDto.builder()
+                .id(infoEntity.get().getId())
+                .title(infoEntity.get().getTitle())
+                .content(infoEntity.get().getContent())
+                .regDate(infoEntity.get().getRegDate())
+                .updateDate(infoEntity.get().getUpdateDate())
+                .increaseCount(infoEntity.get().getIncreaseCount())
+                .build());
+        return infoDto;
+    }
+    public Long deleteInfoId(Long id) {
+        Optional<InfoEntity> infoEntity = infoRepository.findById(id);
+        if (!infoEntity.isPresent()) {
             throw new DuplicateInfoException("삭제할 내용이 없습니다.");
-        }else{
+        } else {
             infoRepository.delete(infoEntity.get());
             return infoEntity.get().getId();
         }
     }
-
+    public List<LocationDto> getBusLocationList() {
+        List<Location> busTransitType = Location.getByTransitType(TransitType.BUS);
+        List<Location> subTransitType = Location.getByTransitType(TransitType.SUBWAY);
+//      List<LocationDto> locations = (List<LocationDto>) LocationDto.from(busTransitType,);
+        List<LocationDto> locations = new ArrayList<>();
+        locations.add(LocationDto.from("버스", busTransitType));
+        locations.add(LocationDto.from("지하철",subTransitType));
+        return locations;
+    }
 }

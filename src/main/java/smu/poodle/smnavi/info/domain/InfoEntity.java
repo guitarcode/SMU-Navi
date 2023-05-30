@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import smu.poodle.smnavi.user.auth.Kind;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +16,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-
 public class InfoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +31,13 @@ public class InfoEntity {
     @UpdateTimestamp
     private LocalDateTime updateDate;
     @Column
+    private Kind kind;
+    @Column
+    private Location location;
+    @Column
     private int increaseCount;
-
-
-
     public void increaseViews(){
         this.increaseCount++;
     }
+
 }
