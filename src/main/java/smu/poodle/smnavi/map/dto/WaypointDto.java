@@ -27,12 +27,13 @@ public class WaypointDto {
                 .build();
     }
 
-    public static List<WaypointDto> edgesToWaypointDtos(List<Edge> edges) {
+    public static List<WaypointDto> edgesToWaypointDtos(List<Edge> edges, List<AccidentDto.Info> accidents) {
         List<WaypointDto> waypointDtos = new ArrayList<>();
 
         for (Edge edge : edges) {
             Waypoint waypoint = edge.getSrc();
-            waypointDtos.add(edge.getSrc().toDto());
+            accidents.addAll(waypoint.getAccidents().stream().map(AccidentDto.Info::of).toList());
+            waypointDtos.add(waypoint.toDto());
         }
         waypointDtos.add(edges.get(edges.size()-1).getDst().toDto());
 
