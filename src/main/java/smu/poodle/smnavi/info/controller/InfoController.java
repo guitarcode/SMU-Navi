@@ -13,6 +13,7 @@ import smu.poodle.smnavi.exceptiony.DuplicateNoticeException;
 import smu.poodle.smnavi.exceptiony.ResponseError;
 import smu.poodle.smnavi.info.domain.InfoEntity;
 import smu.poodle.smnavi.info.dto.InfoDto;
+import smu.poodle.smnavi.info.dto.LocationDto;
 import smu.poodle.smnavi.info.service.InfoService;
 
 import java.util.*;
@@ -48,6 +49,11 @@ public class InfoController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/api/info/button")
+    public ResponseEntity<?>buttons(){
+        List<LocationDto>locationDto1 = infoService.getBusLocationList();
+        return ResponseEntity.ok().body(locationDto1);
+    }
     @PutMapping("/api/info/{id}") //수정
     public ResponseEntity<?>updateInfo(@PathVariable(value = "id")Long id, @RequestBody InfoDto infoDto){
         Optional<InfoEntity>updateInfo = infoService.updateInfo(id, infoDto);
@@ -75,5 +81,6 @@ public class InfoController {
             return ResponseEntity.notFound().build();
         }
     }
+
 
 }
