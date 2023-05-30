@@ -18,8 +18,10 @@ import smu.poodle.smnavi.map.service.SubPathService;
 import smu.poodle.smnavi.map.service.WaypointService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +34,11 @@ public class PathManageService {
     private final RouteDetailPositionApi routeDetailPositionApi;
 
     @Transactional
+    //todo: 이미 있는 경로는 저장하지 않도록 해야함!!!
     public void savePaths(PathDto.Info pathDto) {
         List<SubPath> subPaths = new ArrayList<>(pathDto.getSubPathList().size());
+        List<String> mapObjArr = Arrays.stream(pathDto.getMapObj().split("@")).collect(Collectors.toList());
+
 
         for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
             subPaths.add(SubPath.builder().build());
@@ -66,17 +71,13 @@ public class PathManageService {
                 } else {
                     persistedEdges.add(edgeRepository.save(edge));
                 }
-
-                //엣지의 디테일 루트 만들기
-                String[] mapObjArr = pathDto.getMapObj().split("@");
-
-                for (String s : mapObjArr) {
-                    routeDetailPositionApi.makeDetailPositionList(
-                            subPathDto,
-                            s,
-                            persistedEdges);
-                }
             }
+
+            //엣지의 디테일 루트 만들기
+            routeDetailPositionApi.makeDetailPositionList(
+                    subPathDto,
+                    mapObjArr.remove(0),
+            persistedEdges);
 
             SubPath subPath = SubPath.builder()
                     .sectionTime(subPathDto.getSectionTime())

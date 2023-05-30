@@ -1,7 +1,7 @@
 package smu.poodle.smnavi.map.dto;
 
 import lombok.Data;
-import smu.poodle.smnavi.map.domain.path.FullPath;
+import smu.poodle.smnavi.map.domain.station.Waypoint;
 
 public class RouteDto {
     @Data
@@ -11,11 +11,11 @@ public class RouteDto {
         private String x;
         private String y;
 
-        public Info(FullPath fullPath) {
-            this.startStationId = fullPath.getStartWaypoint().getStartStationId();
-            this.startStationName = fullPath.getStartWaypoint().getPointName();
-            this.x = fullPath.getStartWaypoint().getX();
-            this.y = fullPath.getStartWaypoint().getY();
+        public Info(Waypoint waypoint) {
+            this.startStationId = waypoint.getStartStationId();
+            this.startStationName = waypoint.getPointName();
+            this.x = waypoint.getX();
+            this.y = waypoint.getY();
         }
     }
 }
