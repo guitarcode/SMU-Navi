@@ -1,10 +1,7 @@
-package smu.poodle.smnavi.info.domain;
+package smu.poodle.smnavi.map.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.user.auth.Kind;
 
@@ -12,8 +9,8 @@ import smu.poodle.smnavi.user.auth.Kind;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class AccidentEntity {
+@Getter
+public class Accident {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

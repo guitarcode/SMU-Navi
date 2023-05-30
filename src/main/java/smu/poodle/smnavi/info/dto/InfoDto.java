@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import smu.poodle.smnavi.info.domain.InfoEntity;
+import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.user.auth.Kind;
 import smu.poodle.smnavi.info.domain.Location;
 
@@ -19,8 +20,9 @@ public class InfoDto {
     private LocalDateTime regDate;
     private LocalDateTime updateDate;
     private int increaseCount;
-    private Kind kind;
-    private Location location;
+    private String transitType;
+    private int kind;
+    private String stationId;
 
     @NotEmpty(message = "제목은 필수 항목 입니다.")
     @Size(min = 1, max = 30, message = "제목은 1자 이상 30자 이하로 입력해주세요.")
@@ -37,9 +39,9 @@ public class InfoDto {
                 .content(this.content)
                 .regDate(this.regDate)
                 .updateDate(this.updateDate)
+                .transitType(TransitType.valueOf(transitType))
                 .increaseCount(0)
-                .kind(this.kind)
-                .location(this.location)
+                .kind(Kind.getKindByNumber(this.kind))
                 .build();
     }
 
