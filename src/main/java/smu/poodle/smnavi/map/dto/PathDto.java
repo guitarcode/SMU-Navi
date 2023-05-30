@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import smu.poodle.smnavi.map.domain.data.BusType;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.mapping.FullPathAndSubPath;
 import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
@@ -29,6 +28,9 @@ public class PathDto {
         int time;
         int subPathCnt;
         List<SubPathDto> subPathList;
+
+        List<AccidentDto.Info> accidents;
+
         @JsonIgnore
         String mapObj;
 
@@ -37,6 +39,7 @@ public class PathDto {
                     .map(FullPathAndSubPath::getSubPath).toList();
 
             List<PathDto.SubPathDto> subPathDtos = new ArrayList<>();
+            List<AccidentDto.Info> accidents = new ArrayList<>();
 
             for (SubPath subPath : subPaths) {
                 // 요구사항에 의해 walk 시간이 0이면 반환하지 않도록 처리
@@ -50,13 +53,14 @@ public class PathDto {
 
                 List<Edge> edges = subPath.getEdgeInfos().stream().map(SubPathAndEdge::getEdge).toList();
 
-                subPathDtos.add(PathDto.SubPathDto.makeSubPathDtoWithEdges(subPath, edges));
+                subPathDtos.add(PathDto.SubPathDto.makeSubPathDtoWithEdges(subPath, edges, accidents));
             }
 
             return Info.builder()
                     .subPathList(subPathDtos)
                     .time(fullPath.getTotalTime())
                     .subPathCnt(subPaths.size())
+                    .accidents(accidents)
                     .build();
         }
     }
@@ -83,11 +87,11 @@ public class PathDto {
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<DetailPositionDto> gpsDetail;
 
-        public static SubPathDto makeSubPathDtoWithEdges(SubPath subPath, List<Edge> edges){
+        public static SubPathDto makeSubPathDtoWithEdges(SubPath subPath, List<Edge> edges, List<AccidentDto.Info> accidents){
             SubPathDto subPathDto = SubPathDto.builder()
                     .transitType(subPath.getTransitType())
                     .sectionTime(subPath.getSectionTime())
-                    .stationList(WaypointDto.edgesToWaypointDtos(edges))
+                    .stationList(WaypointDto.edgesToWaypointDtos(edges, accidents))
                     .from(subPath.getToName())
                     .to(subPath.getToName())
                     .gpsDetail(DetailPositionDto.edgesToDetailPositionDtos(edges))

@@ -30,7 +30,6 @@ public class FullPath {
     @JoinColumn(name = "start_waypoint_id")
     Waypoint startWaypoint;
 
-
     public void updateIsSeen() {
         this.isSeen = !this.isSeen;
     }
