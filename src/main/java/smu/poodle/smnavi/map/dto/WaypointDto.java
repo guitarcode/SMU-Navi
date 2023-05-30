@@ -3,6 +3,7 @@ package smu.poodle.smnavi.map.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import smu.poodle.smnavi.map.domain.Accident;
 import smu.poodle.smnavi.map.domain.path.Edge;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 
@@ -18,6 +19,7 @@ public class WaypointDto {
     private String gpsX;
     private String gpsY;
 
+
     public Waypoint toEntity() {
         return Waypoint.builder()
                 .x(this.gpsX)
@@ -29,6 +31,7 @@ public class WaypointDto {
         List<WaypointDto> waypointDtos = new ArrayList<>();
 
         for (Edge edge : edges) {
+            Waypoint waypoint = edge.getSrc();
             waypointDtos.add(edge.getSrc().toDto());
         }
         waypointDtos.add(edges.get(edges.size()-1).getDst().toDto());

@@ -10,5 +10,6 @@ import org.springframework.http.HttpStatusCode;
 @SuperBuilder
 @Getter
 public abstract class BaseResponse {
+    //todo: baseResponse 객체 리팩토링 필요 ㅠ
     private final String message;
 }

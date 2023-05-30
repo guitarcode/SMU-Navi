@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class TransitController {
+public class PathController {
 
     private final PathService pathService;
 
@@ -47,6 +47,8 @@ public class TransitController {
 
         return new ResponseEntity<>(routeList, HttpStatus.OK);
     }
+
+
 }
 
 

@@ -1,17 +1,22 @@
 package smu.poodle.smnavi.info.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import smu.poodle.smnavi.exceptiony.DuplicateInfoException;
 import smu.poodle.smnavi.exceptiony.DuplicateNoticeException;
 import smu.poodle.smnavi.exceptiony.InfoNotFoundException;
+import smu.poodle.smnavi.map.domain.Accident;
 import smu.poodle.smnavi.info.domain.InfoEntity;
+import smu.poodle.smnavi.info.domain.Location;
 import smu.poodle.smnavi.info.dto.InfoDto;
 import smu.poodle.smnavi.info.dto.LocationDto;
 import smu.poodle.smnavi.info.repository.InfoRepository;
 import smu.poodle.smnavi.map.domain.data.TransitType;
-import smu.poodle.smnavi.user.auth.Kind;
-import smu.poodle.smnavi.info.domain.Location;
+import smu.poodle.smnavi.map.domain.station.Waypoint;
+import smu.poodle.smnavi.map.repository.AccidentRepository;
+import smu.poodle.smnavi.map.repository.BusStationRepository;
+import smu.poodle.smnavi.map.repository.SubwayStationRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,13 +24,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class InfoService {
-    @Autowired
-    private InfoRepository infoRepository;
+    private final InfoRepository infoRepository;
+    private final BusStationRepository busStationRepository;
+    private final SubwayStationRepository subwayStationRepository;
+    private final AccidentRepository accidentRepository;
 
-    public InfoService(InfoRepository infoRepository) {
-        this.infoRepository = infoRepository;
-    }
 
     public void addInfo(InfoDto infoDto) {
         LocalDateTime checkDate = LocalDateTime.now().minusMinutes(1); //1분 전의 시간
@@ -37,14 +42,29 @@ public class InfoService {
         if (noticeCount > 0) {
             throw new DuplicateNoticeException("1분 이내에 동일한 내용의 제보 글이 등록되었습니다."); //제목이나 내용이 달라야함. id만 다르면 안됨
         }
-        Kind kind = infoDto.getKind(); // 선택한 Kind 값 가져오기
+
         InfoEntity infoEntity = infoDto.ToEntity();
-        infoEntity.setKind(kind); // 선택한 Kind 값을 저장
-        Location location = infoDto.getLocation();
-        InfoEntity infoEntity1 = infoDto.ToEntity();
-        infoEntity1.setLocation(location);
+        if (infoEntity.getTransitType() == TransitType.BUS) {
+            Waypoint waypoint = busStationRepository.findAllByLocalStationId(infoDto.getStationId()).get(0);
+            infoEntity.setWaypoint(waypoint);
+        }
+        else if (infoEntity.getTransitType() == TransitType.SUBWAY) {
+            Waypoint waypoint = subwayStationRepository.findAllByStationId(Integer.parseInt(infoDto.getStationId())).get(0);
+            infoEntity.setWaypoint(waypoint);
+        }
+
+        createAccident(infoEntity);
 
         infoRepository.save(infoEntity);
+    }
+
+    private void createAccident(InfoEntity infoEntity){
+        Accident accident = Accident.builder()
+                .kind(infoEntity.getKind())
+                .waypoint(infoEntity.getWaypoint())
+                .build();
+
+        accidentRepository.save(accident);
     }
 
     public List<InfoDto> listAllinfo(String keyword) {
@@ -55,8 +75,8 @@ public class InfoService {
             all = infoRepository.findByTitleContainingOrContentContaining(keyword, keyword);
         }
         List<InfoDto> DtoList = new ArrayList<>();
-        for (InfoEntity infoEntity : all) {
 
+        for (InfoEntity infoEntity : all) {
             InfoDto infoDto = InfoDto.builder()
                     .id(infoEntity.getId())
                     .title(infoEntity.getTitle())
@@ -66,6 +86,8 @@ public class InfoService {
                     .build();
             DtoList.add(infoDto);
         }
+
+
         return DtoList;
     }
 
@@ -105,6 +127,7 @@ public class InfoService {
                 .build());
         return infoDto;
     }
+
     public Long deleteInfoId(Long id) {
         Optional<InfoEntity> infoEntity = infoRepository.findById(id);
         if (!infoEntity.isPresent()) {
@@ -114,13 +137,14 @@ public class InfoService {
             return infoEntity.get().getId();
         }
     }
+
     public List<LocationDto> getBusLocationList() {
         List<Location> busTransitType = Location.getByTransitType(TransitType.BUS);
         List<Location> subTransitType = Location.getByTransitType(TransitType.SUBWAY);
 //      List<LocationDto> locations = (List<LocationDto>) LocationDto.from(busTransitType,);
         List<LocationDto> locations = new ArrayList<>();
         locations.add(LocationDto.from("버스", busTransitType));
-        locations.add(LocationDto.from("지하철",subTransitType));
+        locations.add(LocationDto.from("지하철", subTransitType));
         return locations;
     }
 }
