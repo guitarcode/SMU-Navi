@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import smu.poodle.smnavi.map.domain.data.BusType;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.domain.mapping.FullPathAndSubPath;
 import smu.poodle.smnavi.map.domain.mapping.SubPathAndEdge;
@@ -70,7 +71,8 @@ public class PathDto {
 
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         String busType;
-        @JsonIgnore
+
+        @JsonInclude(JsonInclude.Include.NON_EMPTY)
         Integer busTypeInt;
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         String lineName;
@@ -82,16 +84,23 @@ public class PathDto {
         List<DetailPositionDto> gpsDetail;
 
         public static SubPathDto makeSubPathDtoWithEdges(SubPath subPath, List<Edge> edges){
-            return SubPathDto.builder()
+            SubPathDto subPathDto = SubPathDto.builder()
                     .transitType(subPath.getTransitType())
                     .sectionTime(subPath.getSectionTime())
                     .stationList(WaypointDto.edgesToWaypointDtos(edges))
                     .from(subPath.getToName())
                     .to(subPath.getToName())
                     .gpsDetail(DetailPositionDto.edgesToDetailPositionDtos(edges))
+                    .lineName(subPath.getLineName())
                     .from(subPath.getFromName())
                     .to(subPath.getToName())
                     .build();
+
+            if(subPath.getTransitType() == TransitType.BUS) {
+                subPathDto.setBusType(subPath.getBusType().getTypeName());
+            }
+
+            return subPathDto;
         }
 
     }
