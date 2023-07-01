@@ -29,24 +29,32 @@ jobs:
           distribution: 'temurin'
 
 
-        #    - name: Grant execute permission for gradlew
-        #      run: chmod +x ./gradlew
-        #      shell: bash
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew  # gradle wrapper를 실행할 수 있도록 권한 부여
+        shell: bash
 
-        #    - name: init with Gradle
-        #      uses: gradle/gradle-build-action@v2
-
-      - run: gradle init
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 7.6
+        run: ./gradlew clean build  # 프로젝트 빌드
+        shell: bash
 
-      - run: build
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2  # 빌드 완료 시간 가져오기
+        id: current-time
         with:
-          arguments: build
+          format: YYYY-MM-DDTHH-mm-ss
+          utcOffset: "+09:00"
+
+#      - run: gradle init
+#      - name: Build with Gradle
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          gradle-version: 7.6
+#
+#      - run: build
+#      - name: Build with Gradle
+#        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+#        with:
+#          arguments: build
 
             #    - name: Gradle Caching
             #      uses: actions/cache@v3
