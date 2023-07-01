@@ -40,11 +40,11 @@ jobs:
       ## create application-prod.properties
       - name: make application.properties
         run: |
-          sudo mkdir -p ./src/main/resources
+          mkdir -p ./src/main/resources
           cd ./src/main/resources
-          sudo touch ./application.yml
+          touch ./application.yml
           echo "${{ secrets.APP_YML }}" > ./application.yml
-          sudo touch ./application-API-KEY.yml
+          touch ./application-API-KEY.yml
           echo "${{ secrets.API_KEY_YML }}" > ./application-API-KEY.yml
         shell: bash
 
