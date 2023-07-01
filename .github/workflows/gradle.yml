@@ -37,38 +37,6 @@ jobs:
         run: ./gradlew clean build  # 프로젝트 빌드
         shell: bash
 
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2  # 빌드 완료 시간 가져오기
-        id: current-time
-        with:
-          format: YYYY-MM-DDTHH-mm-ss
-          utcOffset: "+09:00"
-
-#      - run: gradle init
-#      - name: Build with Gradle
-#        uses: gradle/gradle-build-action@v2
-#        with:
-#          gradle-version: 7.6
-#
-#      - run: build
-#      - name: Build with Gradle
-#        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-#        with:
-#          arguments: build
-
-            #    - name: Gradle Caching
-            #      uses: actions/cache@v3
-            #      with:
-            #        path: |
-            #          ~/.gradle/caches
-            #          ~/.gradle/wrapper
-            #        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          #        restore-keys: |
-          #          ${{ runner.os }}-gradle-
-
-        # Gradle build를 통해 만들어진 JAR를 beanstalk에 배포하기 위한 ZIP 파일로 만드는 것
-      
-
       ## create application-prod.properties
       - name: make application.properties
         run: |
@@ -78,21 +46,6 @@ jobs:
           touch ./application-API-KEY.yml
           echo "${{ secrets.API_KEY_YML }}" > ./application-API-KEY.yml
         shell: bash
-
-        ## gradle build
-      - name: Build with Gradle
-        run: ./gradlew build -x test
-
-      ## docker build & push to production
-      #    - name: Docker build & push
-      #      run: |
-      #          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      #          docker build -t ${{ secrets.DOCKER_REPO }}/poodle-back .
-      #          docker push ${{ secrets.DOCKER_REPO }}/poodle-back
-
-      #    - name: get GitHub IP
-      #      id: ip
-      #      uses: haythem/public-ip@v1.3
 
       - name: Get current time
         uses: 1466587594/get-current-time@v2  # 빌드 완료 시간 가져오기
@@ -122,32 +75,3 @@ jobs:
           region: ap-northeast-2
           deployment_package: deploy/deploy.zip
           wait_for_deployment: false
-
-#      - name: Configure AWS Credentials
-#        uses: aws-actions/configure-aws-credentials@v1
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws-region: ap-northeast-2
-#
-#      - name: Add Github Actions IP to Security group
-#        run: |
-#          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-#
-#      ## deploy to production
-#      - name: Deploy to prod
-#        uses: appleboy/ssh-action@master
-#        id: deploy
-#        with:
-#          host: ${{ secrets.HOST_PROD }}
-#          username: ec2-user
-#          key: ${{ secrets.PRIVATE_KEY }}
-#          envs: GITHUB_SHA
-#          script: |
-#            ls -al
-#            sudo docker rm -f $(docker ps -qa)
-#            sudo docker pull ${{ secrets.DOCKER_REPO }}/poodle-back
-#            docker-compose up -d
-#            docker image prune -f
-#
-#        ## test
