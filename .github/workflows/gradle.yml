@@ -37,6 +37,16 @@ jobs:
         run: ./gradlew clean build  # 프로젝트 빌드
         shell: bash
 
+      - name: Read secrets from AWS Secrets Manager into environment variables
+        uses: abhilash1in/aws-secrets-manager-action@v1.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+          secrets: |
+            /secret/smunavi
+          parse-json: false   # secret manager
+
       ## create application-prod.properties
       - name: make application.properties
         run: |
