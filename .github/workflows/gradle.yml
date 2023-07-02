@@ -74,7 +74,6 @@ jobs:
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip . 
 
-
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
         with:
