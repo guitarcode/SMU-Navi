@@ -18,6 +18,7 @@ public class Accident {
     @Enumerated(EnumType.ORDINAL)
     private Kind kind;
 
+    private String message;
     @ManyToOne
     private Waypoint waypoint;
 
