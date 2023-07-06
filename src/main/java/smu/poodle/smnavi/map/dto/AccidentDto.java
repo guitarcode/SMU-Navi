@@ -24,7 +24,7 @@ public class AccidentDto {
         public static AccidentDto.Info of(Accident accident) {
             return Info.builder()
                     .id(accident.getId())
-                    .kind(accident.getKind().getKindExplain())
+                    .kind(accident.getMessage())
                     .station(accident.getWaypoint().toDto())
                     .build();
         }
