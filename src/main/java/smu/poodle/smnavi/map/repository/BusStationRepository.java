@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface BusStationRepository extends JpaRepository<BusStation, Long> {
     Optional<BusStation> findFirstByLocalStationId(String localStationId);
 
+    //todo : optional로 변경
     List<Waypoint> findAllByLocalStationId(String localStationId);
 
 }

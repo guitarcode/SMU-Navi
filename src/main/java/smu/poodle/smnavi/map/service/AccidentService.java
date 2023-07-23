@@ -8,10 +8,8 @@ import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.dto.AccidentDto;
 import smu.poodle.smnavi.map.externapi.busarrinfo.AccidentData;
 import smu.poodle.smnavi.map.externapi.busarrinfo.BusArriveInfoApi;
-import smu.poodle.smnavi.map.externapi.dto.BusArriveInfoData;
 import smu.poodle.smnavi.map.repository.AccidentRepository;
 import smu.poodle.smnavi.map.repository.BusStationRepository;
-import smu.poodle.smnavi.map.repository.WayPointRepository;
 
 import java.util.List;
 

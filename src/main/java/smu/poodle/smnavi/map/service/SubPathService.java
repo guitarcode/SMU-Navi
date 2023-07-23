@@ -9,6 +9,7 @@ import smu.poodle.smnavi.map.repository.SubPathAndEdgeRepository;
 import smu.poodle.smnavi.map.repository.SubPathRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,18 +19,24 @@ public class SubPathService {
 
     private final SubPathAndEdgeRepository subPathAndEdgeRepository;
 
-    public void saveWithEdgeMapping(SubPath subPath, List<Edge> edges){
+    public SubPath saveWithEdgeMapping(SubPath subPath, List<Edge> edges) {
         //todo: 겹치는 서브 패스가 있는지 확인해야함
-        subPathRepository.save(subPath);
+        Optional<SubPath> persistedSubPath = subPathRepository.findTopBySrcAndDst(subPath.getSrc(), subPath.getDst());
 
-        for (Edge edge : edges) {
-            subPathAndEdgeRepository.save(
-                    SubPathAndEdge.builder()
-                            .subPath(subPath)
-                            .edge(edge)
-                            .build()
-            );
+        if (persistedSubPath.isPresent()) {
+            return persistedSubPath.get();
+        } else {
+            subPathRepository.save(subPath);
+
+            for (Edge edge : edges) {
+                subPathAndEdgeRepository.save(
+                        SubPathAndEdge.builder()
+                                .subPath(subPath)
+                                .edge(edge)
+                                .build()
+                );
+            }
+            return subPath;
         }
     }
-
 }

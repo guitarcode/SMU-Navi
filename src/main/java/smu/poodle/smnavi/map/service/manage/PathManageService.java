@@ -10,9 +10,9 @@ import smu.poodle.smnavi.map.domain.path.FullPath;
 import smu.poodle.smnavi.map.domain.path.SubPath;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.dto.PathDto;
-import smu.poodle.smnavi.map.dto.WaypointDto;
 import smu.poodle.smnavi.map.odsay.RouteDetailPositionApi;
 import smu.poodle.smnavi.map.repository.EdgeRepository;
+import smu.poodle.smnavi.map.service.EdgeService;
 import smu.poodle.smnavi.map.service.FullPathService;
 import smu.poodle.smnavi.map.service.SubPathService;
 import smu.poodle.smnavi.map.service.WaypointService;
@@ -20,26 +20,25 @@ import smu.poodle.smnavi.map.service.WaypointService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PathManageService {
     private final WaypointService waypointService;
+    private final EdgeService edgeService;
     private final EdgeRepository edgeRepository;
     private final SubPathService subPathService;
     private final FullPathService fullPathService;
-
     private final RouteDetailPositionApi routeDetailPositionApi;
 
     @Transactional
-    //todo: 이미 있는 경로는 저장하지 않도록 해야함!!!
     public void savePaths(PathDto.Info pathDto) {
         List<SubPath> subPaths = new ArrayList<>(pathDto.getSubPathList().size());
+
         List<String> mapObjArr = Arrays.stream(pathDto.getMapObj().split("@")).collect(Collectors.toList());
 
-
+        //todo : 진짜 거지같은 코드를 짜놨네..
         for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
             subPaths.add(SubPath.builder().build());
         }
@@ -50,49 +49,32 @@ public class PathManageService {
             if (subPathDto.getTransitType() == TransitType.WALK)
                 continue;
 
-            //이동 수단이 버스나 지하철인 경우
-            List<Waypoint> waypoints = new ArrayList<>();
+            List<Waypoint> persistedWaypointList = waypointService.saveStationListIfNotExist(subPathDto.getStationList());
+            Waypoint subPathSrc = persistedWaypointList.get(0);
+            Waypoint subPathDst = persistedWaypointList.get(persistedWaypointList.size() - 1);
 
-            for (WaypointDto waypointDto : subPathDto.getStationList()) {
-                Waypoint waypoint = waypointDto.toEntity();
-                Waypoint persistedWaypoint = waypointService.save(waypoint);
-                waypoints.add(persistedWaypoint);
-            }
 
-            List<Edge> edges = makeEdgeExceptWalk(waypoints);
-            List<Edge> persistedEdges = new ArrayList<>();
-
-            // 버스나 지하철인 경우 정류장 및 엣지 정보를 우선 저장
-            for (Edge edge : edges) {
-                Optional<Edge> persistedEdge = edgeRepository.findFirstBySrcIdAndDstId(edge.getSrc().getId(), edge.getDst().getId());
-
-                if (persistedEdge.isPresent()) {
-                    persistedEdges.add(persistedEdge.get());
-                } else {
-                    persistedEdges.add(edgeRepository.save(edge));
-                }
-            }
+            List<Edge> persistedEdgeList = edgeService.makeAndSaveEdgeIfNotExist(persistedWaypointList);
 
             //엣지의 디테일 루트 만들기
-            routeDetailPositionApi.makeDetailPositionList(
-                    subPathDto,
+            routeDetailPositionApi.callApiForSaveDetailPositionList(subPathDto,
                     mapObjArr.remove(0),
-            persistedEdges);
+                    persistedEdgeList);
 
             SubPath subPath = SubPath.builder()
                     .sectionTime(subPathDto.getSectionTime())
                     .transitType(subPathDto.getTransitType())
                     .fromName(subPathDto.getFrom())
                     .toName(subPathDto.getTo())
-                    .src(waypoints.get(0))
-                    .dst(waypoints.get(waypoints.size() - 1))
+                    .src(subPathSrc)
+                    .dst(subPathDst)
                     .busType(BusType.fromTypeNumber(subPathDto.getBusTypeInt()))
                     .lineName(subPathDto.getLineName())
                     .build();
 
-            subPathService.saveWithEdgeMapping(subPath, persistedEdges);
+            SubPath persistedSubPath = subPathService.saveWithEdgeMapping(subPath, persistedEdgeList);
 
-            subPaths.set(i, subPath);
+            subPaths.set(i, persistedSubPath);
         }
 
         for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
@@ -104,15 +86,10 @@ public class PathManageService {
                 Waypoint src, dst;
                 src = subPaths.get(i - 1).getDst();
 
-                //마지막 서브패스는 무조건 걷는 것
+                //마지막 서브패스는 무조건 걷는 것이라고 가정
                 if (i == pathDto.getSubPathList().size() - 1) {
                     //todo: 상명대 위치 픽스하기
-                    dst = Waypoint.builder()
-                            .x("126.955252")
-                            .y("37.602638")
-                            .build();
-
-                    waypointService.save(dst);
+                    dst = waypointService.getSmuWayPoint();
                 } else {
                     dst = subPaths.get(i + 1).getSrc();
                 }
@@ -123,8 +100,7 @@ public class PathManageService {
                         .detailExist(false)
                         .build();
 
-                //todo: edge 서비스로 옮기기
-                edgeRepository.save(edge);
+                edgeService.saveEdgeIfNotExist(edge);
 
                 edges.add(edge);
 
@@ -149,27 +125,6 @@ public class PathManageService {
                 .totalTime(pathDto.getTime())
                 .build();
 
-        fullPathService.saveFullPathMappingSubPath(fullPath, subPaths);
-    }
-
-    public List<Edge> makeEdgeExceptWalk(List<Waypoint> waypoints) {
-        List<Edge> edges = new ArrayList<>();
-        Waypoint src = null;
-
-        for (Waypoint waypoint : waypoints) {
-            if (src == null) {
-                src = waypoint;
-            } else {
-                edges.add(Edge.builder()
-                        .src(src)
-                        .dst(waypoint)
-                        .detailExist(false)
-                        .build());
-
-                src = waypoint;
-            }
-        }
-
-        return edges;
+        FullPath persistedFullPath = fullPathService.saveFullPathMappingSubPath(fullPath, subPaths);
     }
 }
