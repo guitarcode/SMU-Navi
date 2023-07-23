@@ -17,13 +17,11 @@ import java.util.List;
 
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PathDto {
 
     @Getter
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Info {
         int time;
         int subPathCnt;
@@ -47,10 +45,10 @@ public class PathDto {
                 if(subPath.getTransitType() == TransitType.WALK && subPath.getSectionTime() == 0){
                     continue;
                 }
+
                 //엣지를 경유 WaypointDto 로 변환하는 작업
                 //dto 에 팩토리메서드패턴을 구현하여 edge 의 정보를 waypoint 와 detailPosition 으로 변환하고
                 //변환된 정보를 subPathDto 로 담아 생성함
-
                 List<Edge> edges = subPath.getEdgeInfos().stream().map(SubPathAndEdge::getEdge).toList();
 
                 subPathDtos.add(PathDto.SubPathDto.makeSubPathDtoWithEdges(subPath, edges, accidents));
@@ -66,16 +64,13 @@ public class PathDto {
     }
 
     @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
     @Setter
+    @Builder
+    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class SubPathDto {
         TransitType transitType;
-
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         String busType;
-
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         Integer busTypeInt;
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -161,23 +156,4 @@ public class PathDto {
             return detailPositionDtos;
         }
     }
-
-
-
-//    @Data
-//    public static class RouteInfoDto {
-//        private int idx;
-//        private String srcId;
-//        private String src;
-//        private String dstId;
-//        private String dst;
-//
-//        public RouteInfoDto(int idx, RouteInfo routeInfo) {
-//            this.idx = idx;
-//            this.srcId = routeInfo.getEdge().getSrc().getStationId();
-//            this.src = routeInfo.getEdge().getSrc().getStationName();
-//            this.dstId = routeInfo.getEdge().getDst().getStationId();
-//            this.dst = routeInfo.getEdge().getDst().getStationName();
-//        }
-//    }
 }

@@ -15,11 +15,10 @@ public class Accident {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Kind kind;
 
     private String message;
     @ManyToOne
     private Waypoint waypoint;
-
 }

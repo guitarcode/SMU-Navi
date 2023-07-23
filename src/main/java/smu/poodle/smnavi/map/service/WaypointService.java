@@ -5,10 +5,14 @@ import org.springframework.stereotype.Service;
 import smu.poodle.smnavi.map.domain.station.BusStation;
 import smu.poodle.smnavi.map.domain.station.SubwayStation;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
+import smu.poodle.smnavi.map.dto.PathDto;
+import smu.poodle.smnavi.map.dto.WaypointDto;
 import smu.poodle.smnavi.map.repository.BusStationRepository;
 import smu.poodle.smnavi.map.repository.SubwayStationRepository;
 import smu.poodle.smnavi.map.repository.WayPointRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,7 +22,21 @@ public class WaypointService {
     private final BusStationRepository busStationRepository;
     private final SubwayStationRepository subwayStationRepository;
 
-    public Waypoint save(Waypoint waypoint) {
+    
+    public List<Waypoint> saveStationListIfNotExist(List<WaypointDto> waypointDtoList) {
+
+        List<Waypoint> waypointList = new ArrayList<>();
+
+        for (WaypointDto waypointDto : waypointDtoList) {
+            Waypoint waypoint = waypointDto.toEntity();
+            Waypoint persistedWaypoint = saveIfNotExist(waypoint);
+            waypointList.add(persistedWaypoint);
+        }
+
+        return waypointList;
+    }
+    
+    public Waypoint saveIfNotExist(Waypoint waypoint) {
         Optional<? extends Waypoint> optionalWaypoint = findWaypoint(waypoint);
 
         if (optionalWaypoint.isPresent()) {
@@ -26,6 +44,10 @@ public class WaypointService {
         } else {
             return wayPointRepository.save(waypoint);
         }
+    }
+
+    public Waypoint getSmuWayPoint() {
+       return wayPointRepository.getSmuWayPoint();
     }
 
     /**

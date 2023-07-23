@@ -24,11 +24,10 @@ import java.util.List;
 @Transactional
 public class RouteDetailPositionApi {
     private final ApiConstantValue apiConstantValue;
-
     private final TransitRepository transitRepository;
     private final DetailPositionRepository detailPositionRepository;
 
-    public void makeDetailPositionList(PathDto.SubPathDto subPathDto, String mapObj, List<Edge> edges) {
+    public void callApiForSaveDetailPositionList(PathDto.SubPathDto subPathDto, String mapObj, List<Edge> edges) {
         boolean detailExist = true;
 
         for (Edge edge : edges) {

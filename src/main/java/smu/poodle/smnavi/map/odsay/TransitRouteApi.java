@@ -17,7 +17,6 @@ import smu.poodle.smnavi.map.service.manage.PathManageService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +26,7 @@ public class TransitRouteApi {
     private final ApiConstantValue apiConstantValue;
 
 
-    public List<PathDto.Info> getTransitRoute(String startX, String startY, String numbers) {
+    public List<PathDto.Info> callApiAndSavePathIfNotExist(String startX, String startY, List<Integer> indexes) {
 
         String HOST_URL = "https://api.odsay.com/v1/api/searchPubTransPathT";
 
@@ -39,13 +38,7 @@ public class TransitRouteApi {
                 new ApiKeyValue("EX", apiConstantValue.getSMU_X()),
                 new ApiKeyValue("EY", apiConstantValue.getSMU_Y()));
 
-        StringTokenizer st = new StringTokenizer(numbers, ",");
-        List<Integer> numList = new ArrayList<>();
-        while (st.hasMoreTokens()) {
-            numList.add(Integer.parseInt(st.nextToken()));
-        }
-
-        List<PathDto.Info> transitInfoList = makePathDtoList(transitJson, numList);
+        List<PathDto.Info> transitInfoList = parsePathDto(transitJson, indexes);
 
         for (PathDto.Info info : transitInfoList) {
             pathManageService.savePaths(info);
@@ -54,15 +47,16 @@ public class TransitRouteApi {
         return transitInfoList;
     }
 
-    private List<PathDto.Info> makePathDtoList(JSONObject transitJson, List<Integer> numbers) {
+    private List<PathDto.Info> parsePathDto(JSONObject transitJson, List<Integer> indexes) {
         List<PathDto.Info> transitInfoList = new ArrayList<>();
 
         JSONArray pathList = transitJson.getJSONObject("result").getJSONArray("path");
 
-        for (Integer i : numbers) {
+        for (Integer i : indexes) {
             JSONObject path = pathList.getJSONObject(i);
             JSONObject pathInfo = path.getJSONObject("info");
-            int time = pathInfo.getInt("totalTime");
+
+            int totalTime = pathInfo.getInt("totalTime");
 
             String mapObj = pathInfo.getString("mapObj");
 
@@ -70,7 +64,7 @@ public class TransitRouteApi {
 
             transitInfoList.add(PathDto.Info.builder()
                     .subPathList(subPathDtoList)
-                    .time(time)
+                    .time(totalTime)
                     .mapObj(mapObj)
                     .build());
         }

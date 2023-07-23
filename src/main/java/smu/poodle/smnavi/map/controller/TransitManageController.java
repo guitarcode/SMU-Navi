@@ -26,9 +26,9 @@ public class TransitManageController {
     //odsay api 호출해서 api 만드는 요청
     @PostMapping("/api/map/transit")
     public ResponseEntity<BaseResponse> saveTransit(@RequestParam String startX, @RequestParam String startY
-            , @RequestParam String numbers){
+            , @RequestParam List<Integer> indexes){
 
-        List<PathDto.Info> transitRoute = transitRouteApi.getTransitRoute(startX, startY, numbers);
+        List<PathDto.Info> transitRoute = transitRouteApi.callApiAndSavePathIfNotExist(startX, startY, indexes);
 
         TransitResponse transitResponse = TransitResponse.builder()
                 .message("정상적으로 경로를 불러왔습니다.")
