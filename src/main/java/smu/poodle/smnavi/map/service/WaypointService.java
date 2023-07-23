@@ -3,11 +3,12 @@ package smu.poodle.smnavi.map.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import smu.poodle.smnavi.map.domain.station.BusStation;
+import smu.poodle.smnavi.map.domain.station.Place;
 import smu.poodle.smnavi.map.domain.station.SubwayStation;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
-import smu.poodle.smnavi.map.dto.PathDto;
-import smu.poodle.smnavi.map.dto.WaypointDto;
+import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.repository.BusStationRepository;
+import smu.poodle.smnavi.map.repository.PlaceRepository;
 import smu.poodle.smnavi.map.repository.SubwayStationRepository;
 import smu.poodle.smnavi.map.repository.WayPointRepository;
 
@@ -21,22 +22,23 @@ public class WaypointService {
     private final WayPointRepository wayPointRepository;
     private final BusStationRepository busStationRepository;
     private final SubwayStationRepository subwayStationRepository;
+    private final PlaceRepository placeRepository;
 
     
-    public List<Waypoint> saveStationListIfNotExist(List<WaypointDto> waypointDtoList) {
+    public List<Waypoint> saveStationListIfNotExist(List<AbstractWaypointDto> waypointDtoList) {
 
         List<Waypoint> waypointList = new ArrayList<>();
 
-        for (WaypointDto waypointDto : waypointDtoList) {
+        for (AbstractWaypointDto waypointDto : waypointDtoList) {
             Waypoint waypoint = waypointDto.toEntity();
-            Waypoint persistedWaypoint = saveIfNotExist(waypoint);
+            Waypoint persistedWaypoint = getAndSaveIfNotExist(waypoint);
             waypointList.add(persistedWaypoint);
         }
 
         return waypointList;
     }
     
-    public Waypoint saveIfNotExist(Waypoint waypoint) {
+    public Waypoint getAndSaveIfNotExist(Waypoint waypoint) {
         Optional<? extends Waypoint> optionalWaypoint = findWaypoint(waypoint);
 
         if (optionalWaypoint.isPresent()) {
@@ -61,6 +63,8 @@ public class WaypointService {
             return findBusStation((BusStation) waypoint);
         } else if (waypoint instanceof SubwayStation) {
             return findSubwayStation((SubwayStation) waypoint);
+        } else if (waypoint instanceof Place) {
+            return findPlace((Place) waypoint);
         }
         return Optional.empty();
     }
@@ -75,4 +79,7 @@ public class WaypointService {
                 subwayStation.getStationId());
     }
 
+    private Optional<? extends Waypoint> findPlace(Place place) {
+        return placeRepository.findFirstByPlaceName(place.getPlaceName());
+    }
 }

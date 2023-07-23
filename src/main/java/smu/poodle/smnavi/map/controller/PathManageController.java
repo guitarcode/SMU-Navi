@@ -18,17 +18,21 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class TransitManageController {
+public class PathManageController {
     private final TransitRouteApi transitRouteApi;
 
     private final PathService pathService;
 
     //odsay api 호출해서 api 만드는 요청
     @PostMapping("/api/map/transit")
-    public ResponseEntity<BaseResponse> saveTransit(@RequestParam String startX, @RequestParam String startY
-            , @RequestParam List<Integer> indexes){
+    public ResponseEntity<BaseResponse> savePath(
+            @RequestParam String startPlaceName,
+            @RequestParam String startX,
+            @RequestParam String startY,
+            @RequestParam List<Integer> indexes){
 
-        List<PathDto.Info> transitRoute = transitRouteApi.callApiAndSavePathIfNotExist(startX, startY, indexes);
+        List<PathDto.Info> transitRoute =
+                transitRouteApi.callApiAndSavePathIfNotExist(startPlaceName, startX, startY, indexes);
 
         TransitResponse transitResponse = TransitResponse.builder()
                 .message("정상적으로 경로를 불러왔습니다.")

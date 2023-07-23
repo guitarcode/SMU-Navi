@@ -144,7 +144,7 @@ public class BusArriveInfoApi {
     }
 
     @Scheduled(cron = "0 0/10 7-17 * * *")
-    public void getTrafficIssue() {
+    public List<AccidentData> getTrafficIssue() {
         List<BusArriveInfoDto> busArriveInfoDtoList = parseDtoFromXml();
         busRealTimeLocateService.checkTrafficErrorByBusMovement(busArriveInfoDtoList);
 
@@ -153,6 +153,7 @@ public class BusArriveInfoApi {
         accidentDataList.add(isSpacingTooNarrow(busArriveInfoDtoList));
         accidentDataList.add(isNonStop(busArriveInfoDtoList));
 
+        return accidentDataList;
     }
 
     public AccidentData isSpacingTooLarge(List<BusArriveInfoDto> busArriveInfoDtoList) {

@@ -10,8 +10,8 @@ import smu.poodle.smnavi.map.domain.path.FullPath;
 import smu.poodle.smnavi.map.domain.path.SubPath;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.dto.PathDto;
+import smu.poodle.smnavi.map.dto.WaypointDto;
 import smu.poodle.smnavi.map.odsay.RouteDetailPositionApi;
-import smu.poodle.smnavi.map.repository.EdgeRepository;
 import smu.poodle.smnavi.map.service.EdgeService;
 import smu.poodle.smnavi.map.service.FullPathService;
 import smu.poodle.smnavi.map.service.SubPathService;
@@ -27,21 +27,24 @@ import java.util.stream.Collectors;
 public class PathManageService {
     private final WaypointService waypointService;
     private final EdgeService edgeService;
-    private final EdgeRepository edgeRepository;
     private final SubPathService subPathService;
     private final FullPathService fullPathService;
     private final RouteDetailPositionApi routeDetailPositionApi;
 
     @Transactional
-    public void savePaths(PathDto.Info pathDto) {
+    public void savePath(WaypointDto.PlaceDto startPlace, PathDto.Info pathDto) {
+        Waypoint startPoint = waypointService.getAndSaveIfNotExist(startPlace.toEntity());
+
         List<SubPath> subPaths = new ArrayList<>(pathDto.getSubPathList().size());
 
         List<String> mapObjArr = Arrays.stream(pathDto.getMapObj().split("@")).collect(Collectors.toList());
 
         //todo : 진짜 거지같은 코드를 짜놨네..
-        for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
+        for (int i = 0; i < pathDto.getSubPathList().size() + 1; i++) {
             subPaths.add(SubPath.builder().build());
         }
+
+        subPaths.set(0, createFirstWalkSubPath(startPlace, pathDto.getSubPathList().get(0)));
 
         for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
             PathDto.SubPathDto subPathDto = pathDto.getSubPathList().get(i);
@@ -74,7 +77,7 @@ public class PathManageService {
 
             SubPath persistedSubPath = subPathService.saveWithEdgeMapping(subPath, persistedEdgeList);
 
-            subPaths.set(i, persistedSubPath);
+            subPaths.set(i + 1, persistedSubPath);
         }
 
         for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
@@ -84,14 +87,14 @@ public class PathManageService {
                 List<Edge> edges = new ArrayList<>();
                 // 0번째는 WALK 일 수 없도록 처리하였음
                 Waypoint src, dst;
-                src = subPaths.get(i - 1).getDst();
+                src = subPaths.get(i).getDst();
 
                 //마지막 서브패스는 무조건 걷는 것이라고 가정
                 if (i == pathDto.getSubPathList().size() - 1) {
                     //todo: 상명대 위치 픽스하기
                     dst = waypointService.getSmuWayPoint();
                 } else {
-                    dst = subPaths.get(i + 1).getSrc();
+                    dst = subPaths.get(i + 2).getSrc();
                 }
 
                 Edge edge = Edge.builder()
@@ -113,18 +116,47 @@ public class PathManageService {
                         .transitType(TransitType.WALK)
                         .build();
 
-                subPaths.set(i, subPath);
+                SubPath persistedSubPath = subPathService.saveWithEdgeMapping(subPath, edges);
 
-                subPathService.saveWithEdgeMapping(subPath, edges);
+                subPaths.set(i + 1, persistedSubPath);
             }
         }
 
         FullPath fullPath = FullPath.builder()
                 .isSeen(true)
-                .startWaypoint(subPaths.get(0).getSrc())
+                .startWaypoint(startPoint)
                 .totalTime(pathDto.getTime())
                 .build();
 
         FullPath persistedFullPath = fullPathService.saveFullPathMappingSubPath(fullPath, subPaths);
+    }
+
+    private SubPath createFirstWalkSubPath(WaypointDto.PlaceDto startPlace, PathDto.SubPathDto subPathDto) {
+        List<Edge> edges = new ArrayList<>();
+        // 0번째는 WALK 일 수 없도록 처리하였음
+        Waypoint src, dst;
+        src = waypointService.getAndSaveIfNotExist(startPlace.toEntity());
+        dst = waypointService.getAndSaveIfNotExist(subPathDto.getStationList().get(0).toEntity());
+
+        Edge edge = Edge.builder()
+                .src(src)
+                .dst(dst)
+                .detailExist(false)
+                .build();
+
+        edgeService.saveEdgeIfNotExist(edge);
+
+        edges.add(edge);
+
+        SubPath subPath = SubPath.builder()
+                .src(src)
+                .dst(dst)
+                .fromName(edge.getSrc().getPointName())
+                .toName(edge.getDst().getPointName())
+                .sectionTime(subPathDto.getSectionTime())
+                .transitType(TransitType.WALK)
+                .build();
+
+        return subPathService.saveWithEdgeMapping(subPath, edges);
     }
 }

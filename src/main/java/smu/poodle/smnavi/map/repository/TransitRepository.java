@@ -3,7 +3,6 @@ package smu.poodle.smnavi.map.repository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import smu.poodle.smnavi.map.domain.BusRouteInfo;
 import smu.poodle.smnavi.map.domain.path.DetailPosition;
 import smu.poodle.smnavi.map.domain.path.Edge;
 import smu.poodle.smnavi.map.domain.path.FullPath;
@@ -39,9 +38,5 @@ public class TransitRepository {
                         "where r.id = : id ", FullPath.class)
                 .setParameter("id", routeId)
                 .getSingleResult();
-    }
-
-    public void saveBusRouteInfo(BusRouteInfo busRouteInfo) {
-        em.persist(busRouteInfo);
     }
 }

@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import smu.poodle.smnavi.map.domain.Accident;
 import smu.poodle.smnavi.map.domain.path.FullPath;
-import smu.poodle.smnavi.map.dto.WaypointDto;
+import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 //경유지점
-public class Waypoint {
+public abstract class Waypoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -35,23 +35,14 @@ public class Waypoint {
     @OneToMany(mappedBy = "waypoint")
     List<Accident> accidents;
 
-    public String getPointName() {
-        return null;
-    }
+    public abstract String getPointName();
 
-    public String getStartStationId() {
-        return null;
-    }
+    public abstract String getStartStationId();
+
+    public abstract AbstractWaypointDto toDto();
 
     public Waypoint(String x, String y) {
         this.x = x;
         this.y = y;
-    }
-
-    public WaypointDto toDto() {
-        return WaypointDto.builder()
-                .gpsX(x)
-                .gpsY(y)
-                .build();
     }
 }
