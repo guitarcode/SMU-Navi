@@ -1,5 +1,6 @@
 package smu.poodle.smnavi.map.domain.station;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -7,8 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import smu.poodle.smnavi.map.dto.BusStationDto;
 import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
+import smu.poodle.smnavi.map.dto.WaypointDto;
 
 @Entity
 @Getter
@@ -16,27 +17,27 @@ import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BusStation extends Waypoint {
-    String localStationId; //버스는 LocalStationId, 지하철은 StationId
-    String stationName;
+public class Place extends Waypoint{
+    @Column(unique = true)
+    String placeName;
 
     @Override
     public String getPointName() {
-        return this.stationName;
+        return placeName;
     }
 
     @Override
     public String getStartStationId() {
-        return localStationId;
+        return "역이 아닙니다.";
     }
 
     @Override
     public AbstractWaypointDto toDto() {
-        return BusStationDto.builder()
+        return WaypointDto.PlaceDto.builder()
+                .id(super.getId())
                 .gpsX(super.getX())
                 .gpsY(super.getY())
-                .localStationId(localStationId)
-                .stationName(stationName)
+                .placeName(placeName)
                 .build();
     }
 }

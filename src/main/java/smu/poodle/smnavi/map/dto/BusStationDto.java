@@ -3,7 +3,6 @@ package smu.poodle.smnavi.map.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import smu.poodle.smnavi.map.domain.data.BusType;
 import smu.poodle.smnavi.map.domain.station.BusStation;
 
 @Getter
@@ -11,7 +10,7 @@ import smu.poodle.smnavi.map.domain.station.BusStation;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BusStationDto extends WaypointDto {
+public class BusStationDto extends AbstractWaypointDto {
     String localStationId;
     String stationName;
 

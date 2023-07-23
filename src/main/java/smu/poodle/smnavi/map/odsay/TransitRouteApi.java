@@ -8,7 +8,7 @@ import smu.poodle.smnavi.errorcode.ExternApiErrorCode;
 import smu.poodle.smnavi.map.domain.data.TransitType;
 import smu.poodle.smnavi.map.dto.BusStationDto;
 import smu.poodle.smnavi.map.dto.PathDto;
-import smu.poodle.smnavi.map.dto.SubwayStationDto;
+import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.dto.WaypointDto;
 import smu.poodle.smnavi.map.externapi.ApiConstantValue;
 import smu.poodle.smnavi.map.externapi.ApiKeyValue;
@@ -26,7 +26,14 @@ public class TransitRouteApi {
     private final ApiConstantValue apiConstantValue;
 
 
-    public List<PathDto.Info> callApiAndSavePathIfNotExist(String startX, String startY, List<Integer> indexes) {
+    public List<PathDto.Info> callApiAndSavePathIfNotExist(
+            String startPlaceName, String startX, String startY, List<Integer> indexes) {
+
+        WaypointDto.PlaceDto startPlace = WaypointDto.PlaceDto.builder()
+                .placeName(startPlaceName)
+                .gpsX(startX)
+                .gpsY(startY)
+                .build();
 
         String HOST_URL = "https://api.odsay.com/v1/api/searchPubTransPathT";
 
@@ -40,8 +47,8 @@ public class TransitRouteApi {
 
         List<PathDto.Info> transitInfoList = parsePathDto(transitJson, indexes);
 
-        for (PathDto.Info info : transitInfoList) {
-            pathManageService.savePaths(info);
+        for (PathDto.Info path : transitInfoList) {
+            pathManageService.savePath(startPlace, path);
         }
 
         return transitInfoList;
@@ -82,7 +89,7 @@ public class TransitRouteApi {
             String laneName = null;
             String from = null;
             String to = null;
-            List<WaypointDto> waypointDtoList = new ArrayList<>();
+            List<AbstractWaypointDto> waypointDtoList = new ArrayList<>();
 
             int trafficType = subPathJson.getInt("trafficType");
             TransitType type = TransitType.of(trafficType);
@@ -107,7 +114,6 @@ public class TransitRouteApi {
                     laneName = String.valueOf(lane.getInt("subwayCode"));
                 }
                 waypointDtoList = makeStationDtoList(subPathJson, type);
-
             }
 
             subPathDtoList.add(PathDto.SubPathDto.builder()
@@ -125,8 +131,8 @@ public class TransitRouteApi {
     }
 
 
-    private List<WaypointDto> makeStationDtoList(JSONObject subPath, TransitType type) {
-        List<WaypointDto> waypointDtoList = new ArrayList<>();
+    private List<AbstractWaypointDto> makeStationDtoList(JSONObject subPath, TransitType type) {
+        List<AbstractWaypointDto> waypointDtoList = new ArrayList<>();
 
         JSONArray stationList = subPath.getJSONObject("passStopList").getJSONArray("stations");
 
@@ -153,7 +159,7 @@ public class TransitRouteApi {
             } else if (type == TransitType.SUBWAY) {
                 int stationId = station.getInt("stationID");
 
-                waypointDtoList.add(SubwayStationDto.builder()
+                waypointDtoList.add(WaypointDto.SubwayStationDto.builder()
                         .stationId(stationId)
                         .stationName(stationName)
                         .gpsX(x)

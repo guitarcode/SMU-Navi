@@ -4,8 +4,7 @@ import jakarta.persistence.Entity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import smu.poodle.smnavi.map.dto.PathDto;
-import smu.poodle.smnavi.map.dto.SubwayStationDto;
+import smu.poodle.smnavi.map.dto.AbstractWaypointDto;
 import smu.poodle.smnavi.map.dto.WaypointDto;
 
 @Entity
@@ -30,8 +29,8 @@ public class SubwayStation extends Waypoint {
 
 
     @Override
-    public WaypointDto toDto(){
-        return SubwayStationDto.builder()
+    public AbstractWaypointDto toDto(){
+        return WaypointDto.SubwayStationDto.builder()
                 .gpsX(super.getX())
                 .gpsY(super.getY())
                 .stationId(stationId)

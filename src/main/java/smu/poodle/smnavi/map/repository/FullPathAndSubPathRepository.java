@@ -14,9 +14,9 @@ public interface FullPathAndSubPathRepository extends JpaRepository<FullPathAndS
     @Query("select f from FullPath f " +
             "join FullPathAndSubPath as fullAndSubMapping " +
             "on f = fullAndSubMapping.fullPath " +
-            "where count(f) = :subPathSize " +
-            "group by f " +
-            "having fullAndSubMapping.subPath in :subPathList")
+            "where fullAndSubMapping.subPath in :subPathList " +
+            "group by f.id " +
+            "having count(fullAndSubMapping) = :subPathSize ")
     List<FullPath> findAllBySubPath(@Param("subPathList") List<SubPath> subPathList
             , @Param("subPathSize") int subPathSize);
 }

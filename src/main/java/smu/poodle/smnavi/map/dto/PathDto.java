@@ -78,7 +78,7 @@ public class PathDto {
         String from;
         String to;
         Integer sectionTime;
-        List<WaypointDto> stationList;
+        List<AbstractWaypointDto> stationList;
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         List<DetailPositionDto> gpsDetail;
 
@@ -86,7 +86,7 @@ public class PathDto {
             SubPathDto subPathDto = SubPathDto.builder()
                     .transitType(subPath.getTransitType())
                     .sectionTime(subPath.getSectionTime())
-                    .stationList(WaypointDto.edgesToWaypointDtos(edges, accidents))
+                    .stationList(AbstractWaypointDto.edgesToWaypointDtos(edges, accidents))
                     .from(subPath.getToName())
                     .to(subPath.getToName())
                     .gpsDetail(DetailPositionDto.edgesToDetailPositionDtos(edges))
@@ -103,36 +103,6 @@ public class PathDto {
         }
 
     }
-
-
-
-//    @EqualsAndHashCode(callSuper = true)
-//    @FieldDefaults(level = AccessLevel.PRIVATE)
-//    @Data
-//    @SuperBuilder
-//    public static class SubwayStationDto extends WaypointDto {
-//        final Integer stationId; //역 아이디
-//        final String lineName; //호선 이름
-//        final String stationName;
-//
-//        @Override
-//        public SubwayStation toEntity() {
-//            return SubwayStation.builder()
-//                    .x(super.getGpsX())
-//                    .y(super.getGpsY())
-//                    .stationId(this.stationId)
-//                    .lineName(this.lineName)
-//                    .stationName(this.stationName)
-//                    .build();
-//        }
-//
-////        public SubwayStationDto(String gpsX, String gpsY, Integer stationId, String lineName, String stationName) {
-////            super(gpsX, gpsY);
-////            this.stationId = stationId;
-////            this.lineName = lineName;
-////            this.stationName = stationName;
-////        }
-//    }
 
     @Data
     @AllArgsConstructor
