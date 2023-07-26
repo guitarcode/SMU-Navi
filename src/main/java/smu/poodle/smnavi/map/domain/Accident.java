@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-//@Where(clause = "updatedAt > current_timestamp")
+@Where(clause = "updated_at > curdate()")
 @Getter
 public class Accident extends BaseTimeEntity {
     @Id
