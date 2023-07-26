@@ -40,13 +40,14 @@ public class PathManageService {
         List<String> mapObjArr = Arrays.stream(pathDto.getMapObj().split("@")).collect(Collectors.toList());
 
         //todo : 진짜 거지같은 코드를 짜놨네..
-        for (int i = 0; i < pathDto.getSubPathList().size() + 1; i++) {
+        for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
             subPaths.add(SubPath.builder().build());
         }
 
-        subPaths.set(0, createFirstWalkSubPath(startPlace, pathDto.getSubPathList().get(0)));
+        int firstSectionTime = pathDto.getSubPathList().get(0).getSectionTime();
+        subPaths.set(0, createFirstWalkSubPath(startPlace, firstSectionTime, pathDto.getSubPathList().get(1)));
 
-        for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
+        for (int i = 1; i < pathDto.getSubPathList().size(); i++) {
             PathDto.SubPathDto subPathDto = pathDto.getSubPathList().get(i);
 
             if (subPathDto.getTransitType() == TransitType.WALK)
@@ -77,24 +78,24 @@ public class PathManageService {
 
             SubPath persistedSubPath = subPathService.saveWithEdgeMapping(subPath, persistedEdgeList);
 
-            subPaths.set(i + 1, persistedSubPath);
+            subPaths.set(i, persistedSubPath);
         }
 
-        for (int i = 0; i < pathDto.getSubPathList().size(); i++) {
+        for (int i = 1; i < pathDto.getSubPathList().size(); i++) {
             PathDto.SubPathDto subPathDto = pathDto.getSubPathList().get(i);
 
             if (subPathDto.getTransitType() == TransitType.WALK) {
                 List<Edge> edges = new ArrayList<>();
                 // 0번째는 WALK 일 수 없도록 처리하였음
                 Waypoint src, dst;
-                src = subPaths.get(i).getDst();
+                src = subPaths.get(i - 1).getDst();
 
                 //마지막 서브패스는 무조건 걷는 것이라고 가정
                 if (i == pathDto.getSubPathList().size() - 1) {
                     //todo: 상명대 위치 픽스하기
                     dst = waypointService.getSmuWayPoint();
                 } else {
-                    dst = subPaths.get(i + 2).getSrc();
+                    dst = subPaths.get(i + 1).getSrc();
                 }
 
                 Edge edge = Edge.builder()
@@ -118,7 +119,7 @@ public class PathManageService {
 
                 SubPath persistedSubPath = subPathService.saveWithEdgeMapping(subPath, edges);
 
-                subPaths.set(i + 1, persistedSubPath);
+                subPaths.set(i, persistedSubPath);
             }
         }
 
@@ -131,7 +132,7 @@ public class PathManageService {
         FullPath persistedFullPath = fullPathService.saveFullPathMappingSubPath(fullPath, subPaths);
     }
 
-    private SubPath createFirstWalkSubPath(WaypointDto.PlaceDto startPlace, PathDto.SubPathDto subPathDto) {
+    private SubPath createFirstWalkSubPath(WaypointDto.PlaceDto startPlace, int firstSectionTime, PathDto.SubPathDto subPathDto) {
         List<Edge> edges = new ArrayList<>();
         // 0번째는 WALK 일 수 없도록 처리하였음
         Waypoint src, dst;
@@ -153,7 +154,7 @@ public class PathManageService {
                 .dst(dst)
                 .fromName(edge.getSrc().getPointName())
                 .toName(edge.getDst().getPointName())
-                .sectionTime(subPathDto.getSectionTime())
+                .sectionTime(firstSectionTime)
                 .transitType(TransitType.WALK)
                 .build();
 

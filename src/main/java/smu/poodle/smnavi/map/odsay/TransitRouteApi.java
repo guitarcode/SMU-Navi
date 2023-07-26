@@ -98,6 +98,9 @@ public class TransitRouteApi {
 
             if (type == TransitType.WALK) {
                 if (i == 0) {
+                    subPathDtoList.add(PathDto.SubPathDto.builder()
+                            .sectionTime(sectionTime)
+                            .build());
                     continue;
                 }
             } else {
