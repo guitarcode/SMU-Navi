@@ -12,7 +12,7 @@ import java.util.Map;
 public enum Location {
     BUS_GWANGHWAMUN("100000023", TransitType.BUS, "KT광화문지사"), BUS_GYEONGBOKGUNG("100000021", TransitType.BUS, "경복궁역"),
     BUS_CITYHALL("101000033",TransitType.BUS, "시청"),
-    SUB_GWANGHWAMUN("2534", TransitType.SUBWAY,"KT광화문지사"), SUB_GYEONGBOKGUNG("0317",TransitType.SUBWAY,"경복궁역"), SUB_CITYHALL_1("0151",TransitType.SUBWAY,"시청역 1호선"), SUB_CITYHALL_2("0201",TransitType.SUBWAY,"시청역 2호선");
+    SUB_GWANGHWAMUN("533", TransitType.SUBWAY,"광화문 5호선"), SUB_GYEONGBOKGUNG("327",TransitType.SUBWAY,"경복궁 3호선"), SUB_CITYHALL_1("132",TransitType.SUBWAY,"시청역 1호선");
     private final String stationId;
     private final TransitType transitType;
     private final String stationName;

@@ -6,7 +6,7 @@ import jakarta.persistence.TemporalType;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +17,7 @@ public abstract class BaseTimeEntity {
     @Temporal(TemporalType.TIMESTAMP)
     LocalDateTime createdAt;
 
-    @LastModifiedBy
+    @LastModifiedDate
     @Temporal(TemporalType.TIMESTAMP)
     LocalDateTime updatedAt;
 }
