@@ -8,6 +8,7 @@ import smu.poodle.smnavi.map.domain.station.Waypoint;
 import smu.poodle.smnavi.map.dto.BusArriveInfoDto;
 import smu.poodle.smnavi.map.dto.BusRealTimeLocationDto;
 import smu.poodle.smnavi.map.repository.AccidentRepository;
+import smu.poodle.smnavi.map.repository.BusRealTimeLocateLogRepository;
 import smu.poodle.smnavi.map.repository.BusRealTimeLocateRepository;
 import smu.poodle.smnavi.map.repository.BusStationRepository;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BusRealTimeLocateService {
     private final BusRealTimeLocateRepository busRealTimeLocateRepository;
+    private final BusRealTimeLocateLogRepository busRealTimeLocateLogRepository;
     private final AccidentRepository accidentRepository;
     private final BusStationRepository busStationRepository;
 
@@ -29,6 +31,7 @@ public class BusRealTimeLocateService {
 
         for (String licensePlate : busRealTimeLocationDtoMap.keySet()) {
             BusRealTimeLocationDto busRealTimeLocationDto = busRealTimeLocationDtoMap.get(licensePlate);
+            busRealTimeLocateLogRepository.save(busRealTimeLocationDto.toLogEntity("7016"));
             busRealTimeLocateRepository.findByLicensePlate(licensePlate).ifPresentOrElse(
                     busRealTimeLocateInfo -> {
                         if (busRealTimeLocateInfo.getStationOrder() == busRealTimeLocateInfo.getStationOrder()) {
