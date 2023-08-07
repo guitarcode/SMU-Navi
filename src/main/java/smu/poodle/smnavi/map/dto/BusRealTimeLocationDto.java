@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import smu.poodle.smnavi.map.domain.Accident;
 import smu.poodle.smnavi.map.domain.BusRealTimeLocationInfo;
+import smu.poodle.smnavi.map.domain.BusRealTimeLocationLog;
 import smu.poodle.smnavi.map.domain.station.Waypoint;
 
 @Getter
@@ -25,6 +26,15 @@ public class BusRealTimeLocationDto {
 
     public BusRealTimeLocationInfo toInfoEntity(String busName) {
         return BusRealTimeLocationInfo.builder()
+                .busName(busName)
+                .licensePlate(licensePlate)
+                .stationId(stationId)
+                .stationOrder(stationOrder)
+                .build();
+    }
+
+    public BusRealTimeLocationLog toLogEntity(String busName) {
+        return BusRealTimeLocationLog.builder()
                 .busName(busName)
                 .licensePlate(licensePlate)
                 .stationId(stationId)
