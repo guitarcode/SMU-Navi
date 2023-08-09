@@ -143,7 +143,6 @@ public class BusArriveInfoApi {
         return stationOrder - diffOrder;
     }
 
-    @Scheduled(cron = "0 0/10 7-17 * * *")
     public List<AccidentData> getTrafficIssue() {
         List<BusArriveInfoDto> busArriveInfoDtoList = parseDtoFromXml();
         busRealTimeLocateService.checkTrafficErrorByBusMovement(busArriveInfoDtoList);
