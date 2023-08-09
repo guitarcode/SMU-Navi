@@ -34,7 +34,7 @@ public class BusRealTimeLocateService {
             busRealTimeLocateLogRepository.save(busRealTimeLocationDto.toLogEntity("7016"));
             busRealTimeLocateRepository.findByLicensePlate(licensePlate).ifPresentOrElse(
                     busRealTimeLocateInfo -> {
-                        if (busRealTimeLocateInfo.getStationOrder() == busRealTimeLocateInfo.getStationOrder()) {
+                        if (busRealTimeLocateInfo.getStationOrder() == busRealTimeLocationDto.getStationOrder()) {
                             List<Waypoint> busStation = busStationRepository.findAllByLocalStationId(busRealTimeLocationDto.getStationId());
 
                             if (!busStation.isEmpty()) {
